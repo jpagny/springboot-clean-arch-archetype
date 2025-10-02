@@ -1,16 +1,22 @@
-# Compiled class file
+# -----------------------------
+# Java / Build outputs
+# -----------------------------
 *.class
-
-# Log file
 *.log
+hs_err_pid*
+replay_pid*
 
-# BlueJ files
-*.ctxt
+# Maven
+target/
+**/target/
+# Ne PAS ignorer le Maven Wrapper
+!.mvn/
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+mvnw
+mvnw.cmd
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
+# Archives (artefacts packagés)
 *.jar
 *.war
 *.nar
@@ -19,6 +25,78 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+# -----------------------------
+# Spring Boot
+# -----------------------------
+logs/
+*.pid
+# (Optionnel) fichiers de conf locaux
+application-local.yml
+application-local.properties
+application-*.local.yml
+application-*.local.properties
+
+# -----------------------------
+# IDEs / Editors
+# -----------------------------
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+out/
+
+# VS Code
+.vscode/
+
+# Eclipse / STS
+.project
+.classpath
+.settings/
+.apt_generated/
+.factorypath
+.springBeans
+.sts4-cache/
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# -----------------------------
+# OS junk
+# -----------------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------------
+# Editors / merges
+# -----------------------------
+*~
+*.swp
+*.swo
+.*.sw?
+*.orig
+*.rej
+
+# -----------------------------
+# Env / Secrets
+# -----------------------------
+.env
+.env.*
+!.env.example
+
+# -----------------------------
+# Docs / Outils (facultatif)
+# -----------------------------
+*.drawio.bkp
+*.drawio.dtmp
+*.tmp
+
+# -----------------------------
+# Archetype resources
+# -----------------------------
+# On garde les dossiers vides via .gitkeep
+!.gitkeep

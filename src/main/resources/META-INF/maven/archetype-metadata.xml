@@ -1,0 +1,116 @@
+<archetype-descriptor
+        xmlns="https://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.2.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+      https://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.2.0
+      https://maven.apache.org/xsd/archetype-descriptor-1.2.0.xsd"
+        name="quickstart">
+
+    <requiredProperties>
+        <requiredProperty key="groupId"/>
+        <requiredProperty key="artifactId"/>
+        <requiredProperty key="version">
+            <defaultValue>0.0.1-SNAPSHOT</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="package">
+            <defaultValue>com.example</defaultValue>
+        </requiredProperty>
+    </requiredProperties>
+
+    <fileSets>
+        <!-- ===================== JAVA MAIN ===================== -->
+        <fileSet filtered="true">
+            <directory>app/api/src/main/java</directory>
+            <includes><include>__packageInPathFormat__/**</include></includes>
+        </fileSet>
+        <fileSet filtered="true">
+            <directory>app/application/src/main/java</directory>
+            <includes><include>__packageInPathFormat__/**</include></includes>
+        </fileSet>
+        <fileSet filtered="true">
+            <directory>app/bootstrap/src/main/java</directory>
+            <includes><include>__packageInPathFormat__/**</include></includes>
+        </fileSet>
+        <fileSet filtered="true">
+            <directory>app/domain/src/main/java</directory>
+            <includes><include>__packageInPathFormat__/**</include></includes>
+        </fileSet>
+        <fileSet filtered="true">
+            <directory>app/infrastructure/src/main/java</directory>
+            <includes><include>__packageInPathFormat__/**</include></includes>
+        </fileSet>
+
+        <!-- ===================== JAVA TEST ===================== -->
+        <fileSet filtered="true">
+            <directory>app/api/src/test/java</directory>
+            <includes><include>__packageInPathFormat__/**</include></includes>
+        </fileSet>
+        <fileSet filtered="true">
+            <directory>app/application/src/test/java</directory>
+            <includes><include>__packageInPathFormat__/**</include></includes>
+        </fileSet>
+        <fileSet filtered="true">
+            <directory>app/bootstrap/src/test/java</directory>
+            <includes><include>__packageInPathFormat__/**</include></includes>
+        </fileSet>
+        <fileSet filtered="true">
+            <directory>app/domain/src/test/java</directory>
+            <includes><include>__packageInPathFormat__/**</include></includes>
+        </fileSet>
+        <fileSet filtered="true">
+            <directory>app/infrastructure/src/test/java</directory>
+            <includes><include>__packageInPathFormat__/**</include></includes>
+        </fileSet>
+
+        <!-- ===================== RESOURCES ===================== -->
+        <fileSet filtered="true">
+            <directory>app</directory>
+            <includes>
+                <include>*/src/main/resources/**</include>
+                <include>*/src/test/resources/**</include>
+                <include>*/src/**/.gitkeep</include>
+            </includes>
+        </fileSet>
+
+        <!-- ===================== POMs & DOTFILES ===================== -->
+        <fileSet filtered="true">
+            <directory>app</directory>
+            <includes>
+                <include>pom.xml</include>
+                <include>*/pom.xml</include>
+                <include>**/*.md</include>
+                <include>**/.gitignore</include>
+                <include>**/.gitkeep</include>
+            </includes>
+        </fileSet>
+
+        <!-- ===================== DOCS ===================== -->
+        <fileSet>
+            <directory>docs</directory>
+            <includes>
+                <include>**/*</include>
+                <include>**/.*</include>
+            </includes>
+        </fileSet>
+
+        <!-- ===================== HTTP ===================== -->
+        <fileSet>
+            <directory>http</directory>
+            <includes>
+                <include>**/*</include>
+                <include>**/.*</include>
+            </includes>
+        </fileSet>
+
+        <!-- ===================== GENERATED PROJECT ROOT ===================== -->
+        <fileSet filtered="true">
+            <directory>.</directory>
+            <includes>
+                <include>pom.xml</include>
+                <include>README.md</include>
+                <include>.gitignore</include>
+            </includes>
+        </fileSet>
+
+    </fileSets>
+</archetype-descriptor>
