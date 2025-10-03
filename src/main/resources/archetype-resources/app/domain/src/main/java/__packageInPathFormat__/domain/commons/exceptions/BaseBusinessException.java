@@ -38,7 +38,7 @@ public class BaseBusinessException extends RuntimeException implements IBaseExce
     }
 
     private static String formatMessage(BusinessErrorCode error, Object[] args) {
-        String template = (error.getMessageTemplate() == null ? "" : error.getMessageTemplate());
+        var template = (error.getMessageTemplate() == null ? "" : error.getMessageTemplate());
         try {
             return MessageFormat.format(template, args == null ? new Object[0] : args);
         } catch (IllegalArgumentException e) {

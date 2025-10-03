@@ -20,14 +20,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(BaseBusinessException.class)
     public ResponseEntity<DefaultErrorResponse> handleBaseBusinessException(BaseBusinessException ex) {
-        HttpStatus status = httpStatusResolver.resolve(ex.getCode());
-        DefaultErrorResponse body = DefaultErrorResponse.of(ex.getCode().name(), ex.getMessage());
+        var status = httpStatusResolver.resolve(ex.getCode());
+        var body = DefaultErrorResponse.of(ex.getCode().name(), ex.getMessage());
         return ResponseEntity.status(status).body(body);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<DefaultErrorResponse> handleUnexpectedException(Exception ex) {
-        DefaultErrorResponse body = DefaultErrorResponse.of(ex.getClass().getName(), ex.getMessage());
+        var body = DefaultErrorResponse.of(ex.getClass().getName(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 }

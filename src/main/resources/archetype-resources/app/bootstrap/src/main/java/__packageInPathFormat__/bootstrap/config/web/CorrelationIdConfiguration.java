@@ -18,7 +18,7 @@ public class CorrelationIdConfiguration {
 
     @Bean
     public FilterRegistrationBean<CorrelationIdFilter> correlationIdFilterRegistration(CorrelationIdFilter filter) {
-        FilterRegistrationBean<CorrelationIdFilter> reg = new FilterRegistrationBean<>();
+        var reg = new FilterRegistrationBean<CorrelationIdFilter>();
         reg.setFilter(filter);
         reg.setName("correlationIdFilter");
         reg.setOrder(-101);

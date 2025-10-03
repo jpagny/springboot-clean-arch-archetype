@@ -25,12 +25,12 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String incoming = request.getHeader(HEADER);
-        String correlationId = (incoming != null && !incoming.isBlank())
+        var incoming = request.getHeader(HEADER);
+        var correlationId = (incoming != null && !incoming.isBlank())
                 ? incoming
                 : UUID.randomUUID().toString();
 
-        String logNumber = Long.toString(LOG_COUNTER.incrementAndGet());
+        var logNumber = Long.toString(LOG_COUNTER.incrementAndGet());
 
         MDC.put(MDC_FLOW_ID, correlationId);
         MDC.put(MDC_LOG_NUMBER, logNumber);

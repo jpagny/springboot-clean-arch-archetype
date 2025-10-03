@@ -15,7 +15,7 @@ public final class ErrorCodeToHttpStatusResolverImpl implements ErrorCodeToHttpS
     private static final Map<ErrorCode, HttpStatus> MAPPINGS;
 
     static {
-        EnumMap<ErrorCode, HttpStatus> m = new EnumMap<>(ErrorCode.class);
+        var m = new EnumMap<ErrorCode, HttpStatus>(ErrorCode.class);
         m.put(ErrorCode.AN_ERROR_CODE, HttpStatus.NOT_FOUND);
         MAPPINGS = Collections.unmodifiableMap(m);
     }
