@@ -8,6 +8,6 @@
     <packaging>pom</packaging>
     <name>${artifactId} :: parent (aggregator)</name>
     <modules>
-        <module>app</module>
+        <module>backend</module>
     </modules>
 </project>
