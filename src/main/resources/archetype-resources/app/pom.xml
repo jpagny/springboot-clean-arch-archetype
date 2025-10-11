@@ -17,16 +17,17 @@
 
   <properties>
     <java.version>21</java.version>
-    <maven.compiler.release>${java.version}</maven.compiler.release>
-    <lombok.version>1.18.32</lombok.version>
+      <maven.compiler.release>${java.version}</maven.compiler.release>
+      <lombok.version>1.18.32</lombok.version>
+      <modelmapper.version>3.2.0</modelmapper.version>
   </properties>
 
   <modules>
-    <module>domain</module>
-    <module>application</module>
-    <module>api</module>
-    <module>infrastructure</module>
-    <module>bootstrap</module>
+      <module>domain</module>
+      <module>application</module>
+      <module>api</module>
+      <module>infrastructure</module>
+      <module>bootstrap</module>
   </modules>
 
   <dependencyManagement>
@@ -36,7 +37,28 @@
               <artifactId>lombok</artifactId>
               <version>${lombok.version}</version>
           </dependency>
+          <dependency>
+              <groupId>org.modelmapper</groupId>
+              <artifactId>modelmapper</artifactId>
+              <version>${modelmapper.version}</version>
+          </dependency>
       </dependencies>
   </dependencyManagement>
+
+  <build>
+      <pluginManagement>
+          <plugins>
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+              </plugin>
+
+              <plugin>
+                  <groupId>org.springframework.boot</groupId>
+                  <artifactId>spring-boot-maven-plugin</artifactId>
+              </plugin>
+          </plugins>
+      </pluginManagement>
+  </build>
 
 </project>

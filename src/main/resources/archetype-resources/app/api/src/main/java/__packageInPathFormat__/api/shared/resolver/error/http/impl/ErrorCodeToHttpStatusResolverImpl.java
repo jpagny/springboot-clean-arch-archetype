@@ -1,7 +1,7 @@
-package ${package}.web.advice.resolver.impl;
+package ${package}.api.shared.resolver.error.http.impl;
 
-import ${package}.web.advice.resolver.ErrorCodeToHttpStatusResolver;
-import ${package}.domain.commons.exceptions.ErrorCode;
+import ${package}.api.shared.resolver.error.http.ErrorCodeToHttpStatusResolver;
+import ${package}.domain.commons.exceptions.codes.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +16,7 @@ public final class ErrorCodeToHttpStatusResolverImpl implements ErrorCodeToHttpS
 
     static {
         var m = new EnumMap<ErrorCode, HttpStatus>(ErrorCode.class);
-        m.put(ErrorCode.AN_ERROR_CODE, HttpStatus.NOT_FOUND);
+        m.put(ErrorCode.INVALID_VALUE, HttpStatus.NOT_FOUND);
         MAPPINGS = Collections.unmodifiableMap(m);
     }
 

@@ -1,9 +1,10 @@
-package ${package}.web.advice;
+package ${package}.api.shared.advice;
 
-import ${package}.web.dto.DefaultErrorResponse;
-import ${package}.web.advice.resolver.ErrorCodeToHttpStatusResolver;
-import ${package}.domain.commons.exceptions.BaseBusinessException;
-import ${package}.domain.commons.exceptions.ErrorCode;
+import ${package}.api.shared.dto.DefaultErrorResponse;
+import ${package}.api.shared.resolver.error.message.impl.BusinessErrorMessageResolverImpl;
+import ${package}.api.shared.resolver.error.http.ErrorCodeToHttpStatusResolver;
+import ${package}.domain.commons.exceptions.engine.BaseBusinessException;
+import ${package}.domain.commons.exceptions.codes.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -26,16 +27,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public static final String ERROR_PREFIX = "error.";
     public static final String TRACE_ID_KEY = "X-Flow-Id";
 
+    private final BusinessErrorMessageResolverImpl businessErrorMessageResolver;
     private final ErrorCodeToHttpStatusResolver httpStatusResolver;
     private final MessageSource messageSource;
 
     @ExceptionHandler(BaseBusinessException.class)
     public ResponseEntity<DefaultErrorResponse> handleBaseBusinessException(BaseBusinessException ex,
                                                                             HttpServletRequest request) {
-        var status = httpStatusResolver.resolve(ex.getCode());
-        var localized = resolveMessage(ex.getCode(), ex.getArgs(), ex.getMessage());
+        var locale = LocaleContextHolder.getLocale();
         var traceId = MDC.get(TRACE_ID_KEY);
         var path = request.getRequestURI();
+
+        var status = httpStatusResolver.resolve(ex.getCode());
+        var  localized = businessErrorMessageResolver.resolve(ex.getBusinessError(), locale, ex.getArgs());
+
         var body = DefaultErrorResponse.of(ex.getCode().name(), localized, status.value(), path, traceId);
 
         return ResponseEntity.status(status).body(body);
@@ -43,7 +48,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<DefaultErrorResponse> handleUnexpectedException(Exception ex, HttpServletRequest request) {
+
         log.error("Unhandled exception", ex);
+
         var status = HttpStatus.INTERNAL_SERVER_ERROR;
         var traceId = MDC.get(TRACE_ID_KEY);
         var path = request.getRequestURI();
@@ -55,6 +62,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private String resolveMessage(ErrorCode code, Object[] args, String defaultMsg) {
         var locale = LocaleContextHolder.getLocale();
+
         return messageSource.getMessage(
                 ERROR_PREFIX + code.name().toLowerCase(Locale.ROOT),
                 args,

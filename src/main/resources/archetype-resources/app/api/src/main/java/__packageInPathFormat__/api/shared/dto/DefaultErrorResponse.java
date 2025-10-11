@@ -1,4 +1,4 @@
-package ${package}.web.dto;
+package ${package}.api.shared.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
