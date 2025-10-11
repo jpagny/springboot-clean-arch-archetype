@@ -18,12 +18,12 @@
     </dependency>
     <dependency>
       <groupId>${groupId}</groupId>
-      <artifactId>${artifactId}-api</artifactId>
+      <artifactId>${artifactId}-entrypoint</artifactId>
       <version>${version}</version>
     </dependency>
     <dependency>
       <groupId>${groupId}</groupId>
-      <artifactId>${artifactId}-infrastructure</artifactId>
+      <artifactId>${artifactId}-external</artifactId>
       <version>${version}</version>
     </dependency>
   </dependencies>

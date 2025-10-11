@@ -39,6 +39,10 @@
             <directory>backend/external/src/main/java</directory>
             <includes><include>__packageInPathFormat__/**</include></includes>
         </fileSet>
+        <fileSet filtered="true">
+            <directory>backend/presentation/src/main/java</directory>
+            <includes><include>__packageInPathFormat__/**</include></includes>
+        </fileSet>
 
         <!-- ===================== JAVA TEST ===================== -->
         <fileSet filtered="true">
@@ -59,6 +63,10 @@
         </fileSet>
         <fileSet filtered="true">
             <directory>backend/external/src/test/java</directory>
+            <includes><include>__packageInPathFormat__/**</include></includes>
+        </fileSet>
+        <fileSet filtered="true">
+            <directory>backend/presentation/src/test/java</directory>
             <includes><include>__packageInPathFormat__/**</include></includes>
         </fileSet>
 

@@ -9,11 +9,16 @@
         <version>${version}</version>
     </parent>
 
-    <artifactId>${artifactId}-application</artifactId>
-    <name>${artifactId} :: application</name>
+    <artifactId>${artifactId}-presentation</artifactId>
+    <name>${artifactId} :: presentation</name>
     <packaging>jar</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>${groupId}</groupId>
+            <artifactId>${artifactId}-application</artifactId>
+            <version>${version}</version>
+        </dependency>
         <dependency>
             <groupId>${groupId}</groupId>
             <artifactId>${artifactId}-domain</artifactId>
@@ -23,13 +28,11 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-            <scope>provided</scope>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
         </dependency>
 
         <dependency>
@@ -39,10 +42,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <scope>test</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
     </dependencies>
-
 </project>

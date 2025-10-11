@@ -1,0 +1,12 @@
+### Create example
+POST {{baseUrl}}/api/examples
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Mon premier exemple"
+}
+
+### Get all examples
+GET {{baseUrl}}/api/examples
+Accept: application/json

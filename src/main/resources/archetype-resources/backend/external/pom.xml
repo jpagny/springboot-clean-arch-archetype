@@ -7,8 +7,8 @@
     <artifactId>${artifactId}-parent</artifactId>
     <version>${version}</version>
   </parent>
-  <artifactId>${artifactId}-infrastructure</artifactId>
-  <name>${artifactId} :: infrastructure</name>
+  <artifactId>${artifactId}-external</artifactId>
+  <name>${artifactId} :: external</name>
   <packaging>jar</packaging>
 
   <!-- Modules -->
@@ -18,7 +18,19 @@
       <artifactId>${artifactId}-domain</artifactId>
       <version>${version}</version>
     </dependency>
-  </dependencies>
 
+      <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context</artifactId>
+          <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-tx</artifactId>
+          <scope>provided</scope>
+      </dependency>
+
+  </dependencies>
 
 </project>

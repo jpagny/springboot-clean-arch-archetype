@@ -1,64 +1,117 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-parent</artifactId>
-      <version>3.3.4</version>
-      <relativePath/>
-  </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>${groupId}</groupId>
-  <artifactId>${artifactId}-parent</artifactId>
-  <version>${version}</version>
-  <packaging>pom</packaging>
-  <name>${artifactId} :: parent</name>
+    <!-- Parent Spring Boot : gère les versions des deps/plugins -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.4</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
 
-  <properties>
-    <java.version>21</java.version>
-      <maven.compiler.release>${java.version}</maven.compiler.release>
-      <lombok.version>1.18.32</lombok.version>
-      <modelmapper.version>3.2.0</modelmapper.version>
-  </properties>
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}-parent</artifactId>
+    <version>${version}</version>
+    <packaging>pom</packaging>
+    <name>${artifactId} :: parent</name>
 
+    <!-- Propriétés communes -->
+    <properties>
+        <!-- Java pour tous les modules -->
+        <java.version>21</java.version>
+        <!-- Optionnel, mais explicite pour maven-compiler-plugin -->
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Libs optionnelles centralisées -->
+        <lombok.version>1.18.32</lombok.version>
+        <modelmapper.version>3.2.0</modelmapper.version>
+    </properties>
+
+    <!-- Modules enfants -->
     <modules>
         <module>domain</module>
         <module>application</module>
-        <module>entrypoint</module>
+        <module>presentation</module>
         <module>external</module>
+        <module>entrypoint</module>
         <module>bootstrap</module>
     </modules>
 
-  <dependencyManagement>
-      <dependencies>
-          <dependency>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-              <version>${lombok.version}</version>
-          </dependency>
-          <dependency>
-              <groupId>org.modelmapper</groupId>
-              <artifactId>modelmapper</artifactId>
-              <version>${modelmapper.version}</version>
-          </dependency>
-      </dependencies>
-  </dependencyManagement>
+    <!-- Gestion des versions de quelques deps "hors BOM" -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.modelmapper</groupId>
+                <artifactId>modelmapper</artifactId>
+                <version>${modelmapper.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-  <build>
-      <pluginManagement>
-          <plugins>
-              <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-compiler-plugin</artifactId>
-              </plugin>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Compile tous les modules avec Java 21 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                    <configuration>
+                        <release>${maven.compiler.release}</release>
+                    </configuration>
+                </plugin>
 
-              <plugin>
-                  <groupId>org.springframework.boot</groupId>
-                  <artifactId>spring-boot-maven-plugin</artifactId>
-              </plugin>
-          </plugins>
-      </pluginManagement>
-  </build>
+                <!-- Plugins de test (optionnels mais conseillés) -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.2.5</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>3.2.5</version>
+                </plugin>
 
+                <!-- Spring Boot plugin : ne l’active que dans le module "bootstrap" -->
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <!-- pas de configuration ici : le module "bootstrap" l’appliquera -->
+                </plugin>
+
+                <!-- (Optionnel) Enforcer : exige Java 21 au build -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.4.1</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-java</id>
+                            <goals><goal>enforce</goal></goals>
+                            <configuration>
+                                <rules>
+                                    <requireJavaVersion>
+                                        <version>[${java.version},)</version>
+                                    </requireJavaVersion>
+                                </rules>
+                                <fail>true</fail>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
