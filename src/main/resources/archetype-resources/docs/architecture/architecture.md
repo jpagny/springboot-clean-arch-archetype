@@ -1,4 +1,4 @@
-# 🏗️ Architecture Overview
+# 🏷️ Architecture Overview
 
 This project implements a **Clean Architecture** using Spring Boot with a **multi-module structure**.  
 The goal is to keep business rules independent of frameworks and I/O, and to isolate infrastructure, wiring, and presentation logic cleanly.
@@ -28,73 +28,86 @@ backend/
 │  └─ src/main/java/com/example/application/
 │     └─ services/example/
 │        ├─ ExampleApplicationService.java
-│        └─ impl/                   # Optional: implementations of use cases
+│        └─ impl/                   # Optional: use case implementations
 │
 ├─ presentation/
 │  ├─ pom.xml
 │  ├─ src/main/java/com/example/presentation/
 │  │  ├─ common/
 │  │  │  ├─ configuration/
-│  │  │  │  └─ MessageResourceConfiguration.java
-│  │  │  ├─ i18n/
-│  │  │  │  ├─ MessageResolver.java
-│  │  │  │  └─ impl/
-│  │  │  │     └─ MessageResolverImpl.java
-│  │  │  └─ qualifier/
-│  │  │     └─ PresentationConverter.java
+│  │  │  │  └─ MessageResourceConfiguration.java   # Loads i18n bundles dynamically
+│  │  │  ├─ errors/
+│  │  │  │  ├─ DefaultErrorResponse.java           # Standardized error response DTO
+│  │  │  │  ├─ http/
+│  │  │  │  │  ├─ ErrorCodeToHttpStatusResolver.java
+│  │  │  │  │  └─ impl/DefaultErrorCodeToHttpStatusResolverImpl.java
+│  │  │  │  └─ resolver/
+│  │  │     ├─ BusinessErrorMessageResolver.java
+│  │  │     └─ impl/BusinessErrorMessageResolverImpl.java
+│  │  ├─ i18n/
+│  │  │  ├─ MessageResolver.java
+│  │  │  └─ impl/MessageResolverImpl.java
+│  │  └─ qualifier/
+│  │     └─ PresentationConverter.java
+│  │
 │  │  ├─ config/
-│  │  │  └─ ModelMapperPresentationConfig.java  # Bean "presentationMapper" + converter registration
+│  │  │  └─ ModelMapperPresentationConfig.java     # Bean "presentationMapper" + converter registration
+│  │
 │  │  └─ representations/
 │  │     └─ example/
 │  │        ├─ input/
-│  │        │  ├─ requests/                      # Input DTOs (used by entrypoint)
+│  │        │  ├─ requests/                        # Input DTOs (used by entrypoint)
 │  │        │  │  └─ CreateExampleRequest.java
 │  │        │  ├─ converters/
 │  │        │  │  └─ CreateExampleRequestToCommandConverter.java
 │  │        │  └─ presenters/
 │  │        │     └─ CreateExampleInputPresenter.java
 │  │        ├─ output/
-│  │        │  ├─ responses/                     # Output DTOs
+│  │        │  ├─ responses/                       # Output DTOs
 │  │        │  │  └─ CreateExampleResponse.java
 │  │        │  ├─ converters/
 │  │        │  │  └─ CreateExampleResultToResponseConverter.java
 │  │        │  └─ presenters/
 │  │        │     └─ CreateExampleOutputPresenter.java
 │  │        └─ facade/
-│  │           └─ ExampleEndpointFacade.java     # Presentation orchestration layer
+│  │           └─ ExampleEndpointFacade.java       # Presentation orchestration layer
+│  │
 │  └─ src/main/resources/
 │     └─ i18n/
 │        ├─ example.properties
 │        ├─ example_fr.properties
-│        └─ errors.properties                    # Optional
+│        ├─ global_errors.properties
+│        └─ global_errors_fr.properties
 │
 ├─ external/
 │  ├─ pom.xml
 │  └─ src/main/java/com/example/external/
 │     ├─ persistence/
-│     │  ├─ entity/                              # JPA Entities
-│     │  └─ adapter/                             # Implements ExampleRepositoryPort (@Repository)
-│     ├─ httpclient/                             # REST clients (outbound)
-│     └─ messaging/                              # Kafka / RabbitMQ adapters
+│     │  ├─ entity/                                # JPA Entities
+│     │  └─ adapter/                               # Implements ExampleRepositoryPort (@Repository)
+│     ├─ httpclient/                               # REST clients (outbound)
+│     └─ messaging/                                # Kafka / RabbitMQ adapters
 │
 ├─ entrypoint/
 │  ├─ pom.xml
 │  └─ src/main/java/com/example/entrypoint/
 │     ├─ rest/
 │     │  ├─ endpoints/example/controller/
-│     │  │  └─ ExampleController.java            # Uses presentation facade + DTOs
-│     │  └─ advice/                              # @ControllerAdvice for error handling
+│     │  │  └─ ExampleController.java              # Uses presentation facade + DTOs
+│     │  └─ advice/
+│     │     └─ GlobalExceptionHandler.java         # Delegates to resolvers in presentation
 │     └─ config/
-│        └─ I18nWebConfig.java                   # AcceptHeaderLocaleResolver (web locale)
+│        └─ I18nWebConfig.java                     # AcceptHeaderLocaleResolver (web locale)
+│
 │  └─ src/main/resources/
 │     └─ logback-spring.xml
 │
 └─ bootstrap/
    ├─ pom.xml
    └─ src/main/java/com/example/bootstrap/
-      ├─ Application.java                         # @SpringBootApplication(scanBasePackages="com.example")
+      ├─ Application.java                           # @SpringBootApplication(scanBasePackages="com.example")
       └─ configuration/
-         └─ ModelMapperConfiguration.java         # Global mappers (e.g., externalMapper)
+         └─ ModelMapperConfiguration.java           # Global mappers (e.g., externalMapper)
 ```
 
 ---
@@ -103,9 +116,9 @@ backend/
 
 | Module | Responsibility |
 |---------|----------------|
-| **domain** | Pure business logic: entities, value objects, domain services, commands, queries, and ports. No framework dependencies. |
-| **application** | Application services and use case orchestration. Invokes domain logic and ports (in/out). Framework-agnostic. |
-| **presentation** | Converts data between entrypoint DTOs and domain commands/results. Hosts ModelMapper config, presenters, and i18n logic. |
-| **external** | Outbound adapters (database, HTTP clients, messaging). Implements domain output ports. |
-| **entrypoint** | Inbound adapters (REST controllers, request validation, exception handling). Delegates to presentation layer. |
-| **bootstrap** | Spring Boot runtime layer: starts the app, wires modules, defines filters, and logging setup. |
+| **domain** | Pure business logic — entities, value objects, domain services, commands, queries, and ports. No dependency on frameworks. |
+| **application** | Orchestrates use cases. Calls domain ports and aggregates business workflows. Framework-agnostic. |
+| **presentation** | Contains DTO converters, presenters, i18n handling, and all error/message resolvers. Translates between domain and entrypoint. |
+| **external** | Outbound adapters (database, REST, messaging). Implements domain output ports. |
+| **entrypoint** | Inbound adapters (REST controllers, validation, HTTP exposure). Delegates logic to presentation. Contains only wiring and exception handler facade. |
+| **bootstrap** | Application runtime configuration. Starts Spring Boot, configures base packages, and initializes cross-module beans (e.g., ModelMapper, logging). |
