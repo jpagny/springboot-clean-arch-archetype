@@ -114,28 +114,3 @@ Accept-Language: fr
 {
   "name": "forbidden"
 }
-
-
-######################################################################
-# 💣 TECHNICAL ERROR
-######################################################################
-
-### 🇬🇧 Technical — simulated crash (INTERNAL_ERROR) → 500
-POST {{baseUrl}}/api/examples
-Content-Type: application/json
-Accept: application/json
-Accept-Language: en
-
-{
-  "name": "crash"
-}
-
-### 🇫🇷 Technique — panne simulée (INTERNAL_ERROR) → 500
-POST {{baseUrl}}/api/examples
-Content-Type: application/json
-Accept: application/json
-Accept-Language: fr
-
-{
-  "name": "crash"
-}
