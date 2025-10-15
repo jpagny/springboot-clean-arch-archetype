@@ -34,5 +34,4 @@ public class BaseBusinessException extends RuntimeException implements IBaseExce
         return businessError;
     }
 
-
 }

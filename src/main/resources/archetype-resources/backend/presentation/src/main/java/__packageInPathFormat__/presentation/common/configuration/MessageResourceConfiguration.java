@@ -10,9 +10,10 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
+import java.util.Locale;
 import java.util.Objects;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 @Slf4j
 @Configuration
@@ -21,13 +22,13 @@ public class MessageResourceConfiguration {
     @Bean
     public MessageSource messageSource() {
         var resolver = new PathMatchingResourcePatternResolver();
-        Set<String> basenames = new HashSet<>();
+        SortedSet<String> basenames = new TreeSet<>();
 
         try {
             var resources = resolver.getResources("classpath*:i18n/*.properties");
             for (var res : resources) {
-                String filename = Objects.requireNonNull(res.getFilename());
-                String base = filename.replaceFirst("(_[a-zA-Z]{2}(_[A-Z]{2})?)?\\.properties$", "");
+                var filename = Objects.requireNonNull(res.getFilename());
+                var base = filename.replaceFirst("(_[a-zA-Z]{2}(_[A-Z]{2})?)?\\.properties$", "");
                 basenames.add("classpath:i18n/" + base);
             }
         } catch (IOException e) {
@@ -39,9 +40,10 @@ public class MessageResourceConfiguration {
         src.setDefaultEncoding(StandardCharsets.UTF_8.name());
         src.setFallbackToSystemLocale(false);
         src.setUseCodeAsDefaultMessage(false);
+        src.setAlwaysUseMessageFormat(true);
 
         if (log.isDebugEnabled()) {
-            log.debug("[i18n] Loaded message bundles: {}", basenames);
+            log.debug("[i18n] Loaded message bundles (ordered): {}", basenames);
         }
 
         return src;
@@ -49,6 +51,6 @@ public class MessageResourceConfiguration {
 
     @Bean
     public MessageSourceAccessor messageSourceAccessor(MessageSource messageSource) {
-        return new MessageSourceAccessor(messageSource);
+        return new MessageSourceAccessor(messageSource, Locale.ENGLISH);
     }
 }

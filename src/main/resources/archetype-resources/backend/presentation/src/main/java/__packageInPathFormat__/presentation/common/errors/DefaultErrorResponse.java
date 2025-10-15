@@ -1,4 +1,4 @@
-package ${package}.entrypoint.rest.common.dto;
+package com.example.presentation.common.errors;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;

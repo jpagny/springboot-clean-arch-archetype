@@ -1,4 +1,4 @@
-package ${package}.entrypoint.rest.common.resolver.error.message;
+package ${package}.presentation.common.i18n;
 
 import ${package}.domain.commons.exceptions.engine.IBusinessError;
 
