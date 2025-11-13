@@ -1,6 +1,6 @@
 package ${package}.bootstrap.configuration;
 
-import ${package}.presentation.common.qualifier.PresentationConverter;
+import ${package}.transport.common.qualifier.PresentationConverter;
 import ${package}.external.common.qualifier.ExternalConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;

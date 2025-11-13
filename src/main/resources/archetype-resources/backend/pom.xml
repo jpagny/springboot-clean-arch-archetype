@@ -36,9 +36,9 @@
     <modules>
         <module>domain</module>
         <module>application</module>
-        <module>presentation</module>
+        <module>transport</module>
         <module>external</module>
-        <module>entrypoint</module>
+        <module>api</module>
         <module>bootstrap</module>
     </modules>
 

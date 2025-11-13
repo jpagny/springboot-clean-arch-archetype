@@ -18,7 +18,7 @@
     </dependency>
     <dependency>
       <groupId>${groupId}</groupId>
-      <artifactId>${artifactId}-entrypoint</artifactId>
+      <artifactId>${artifactId}-api</artifactId>
       <version>${version}</version>
     </dependency>
     <dependency>
