@@ -1,7 +1,7 @@
 # 🏷️ Architecture Overview
 
-This project follows a **Clean Architecture** using Spring Boot with a **multi-module structure**.  
-Its goal is to keep business logic **independent of frameworks**, isolate **technical details**, and ensure **clear modular boundaries** between layers.
+This project follows a **Clean Architecture** with a modular Spring Boot setup.  
+Each module has a **single responsibility**, ensuring maintainability, testability, and separation of concerns.
 
 ---
 
@@ -9,80 +9,138 @@ Its goal is to keep business logic **independent of frameworks**, isolate **tech
 
 ```
 backend/
-├─ pom.xml                          # Parent Maven POM (module aggregator)
+├─ pom.xml                     # Maven aggregator
 │
-├─ domain/                          # Pure business logic — entities, value objects, use cases, ports
-│
-├─ application/                     # Application orchestration layer — coordinates use cases and transactions
-│
-├─ presentation/                    # Presentation mapping — converts between DTOs and domain models, handles i18n and errors
-│
-├─ external/                        # Outbound adapters — persistence, REST clients, messaging, etc.
-│
-├─ entrypoint/                      # Inbound adapters — REST controllers, web config, exception handling
-│
-└─ bootstrap/                       # Spring Boot runtime — main entrypoint and cross-module configuration
+├─ domain/                    # Pure domain (POJO) — entities, value objects, domain ports
+├─ application/               # Use cases — business orchestration, may use reactive types
+├─ transport/                 # Mapping layer — endpoint handlers, presenters, DTO
+├─ api/                       # HTTP entrypoint — WebFlux controllers & routing
+├─ external/                  # Technical adapters — DB, filesystem, OpenAI, etc.
+└─ bootstrap/                 # Spring Boot main module & system-level configuration
 ```
 
 ---
 
 ## ⚙️ Module Responsibilities
 
-| Module | Responsibility |
-|---------|----------------|
-| **domain** | Contains **core business rules** — entities, value objects, domain services, and use case ports (input/output). Independent from frameworks. |
-| **application** | Implements **application-level services** and orchestrates **use case execution**. Handles transactions and coordinates domain + external interactions. |
-| **presentation** | Defines **DTOs, presenters, and converters** for mapping between the external world and the domain. Also manages **internationalization** and **error resolution**. |
-| **external** | Contains **infrastructure implementations** of output ports — databases, HTTP clients, message brokers, file systems, etc. |
-| **entrypoint** | Exposes the system through **controllers and APIs**. Handles validation, exception translation, and localization setup. Delegates business logic to presentation facades. |
-| **bootstrap** | Contains the **main Spring Boot application** and high-level configuration (logging, model mappers, and bean registration across modules). |
-
----
-
-## 🔗 Flow Overview
+### **1. domain/**
+- 100% **framework-free**
+- Only **POJOs**, records, Java types
+- Contains:
+    - Entities & Value Objects
+    - Domain business rules (pure functions)
+    - **Domain ports** (interfaces — synchronous)
 
 ```
-Entrypoint (REST, Web)
-   ↓
-Presentation (DTO → Command → Response)
-   ↓
-Application (Use case orchestration, @Transactional)
-   ↓
-Domain (Business logic, Entities, Ports)
-   ↓
-External (Persistence, APIs, Messaging)
+No Spring
+No Reactor
+No annotations
 ```
 
 ---
 
-## 🌍 Internationalization
-
-- All messages (validation, errors, business texts) are defined under:
-  ```
-  presentation/src/main/resources/i18n/
-  ```
-- Organized by module (e.g. `example.properties`, `global_errors.properties`).
-- Supports multi-language fallback (`example_fr.properties`, etc.).
-
----
-
-## ⚙️ Error Management
-
-- **Domain** defines `BaseBusinessException` and business error codes.
-- **Presentation** layer resolves messages and HTTP status codes.
-- **Entrypoint** layer (`GlobalExceptionHandler`) exposes consistent API error responses.
+### **2. application/**
+- Implements **use cases**
+- Orchestrates domain + external
+- May use **Mono/Flux**
+- Contains:
+    - Use case classes (`PromptRunnerUseCase`, `PromptQueryUseCase`)
+    - **Application ports** (e.g. `ChatClient`, `PromptFileLoader`)
+    - Transaction boundaries
+    - Rules that involve multiple repositories
 
 ---
 
-## 💡 Design Principles
+### **3. transport/**
+Layer between API and application.  
+Responsible for **all input/output conversions**.
 
-1. **Business logic never depends on frameworks.**
-2. **Each module has a single, clear responsibility.**
-3. **Dependencies always flow inward.**
-4. **Technical details are replaceable — domain stays stable.**
-5. **Presentation and Entrypoint handle only input/output orchestration.**
+Contains:
+
+- `EndpointHandler<I,O>`
+- `InputPresenter<DTO, Command>`
+- `OutputPresenter<Result, DTO>`
+- Request/Response DTO (pure)
+
+Structure example:
+
+```
+transport/
+  common/
+    contracts/
+  endpoints/
+    prompt/
+      run/
+        handler/
+        presenter/
+        dto/
+```
+
+No business logic here.
 
 ---
 
-> 🧠 *“Frameworks are tools — not architecture.”*
+### **4. api/**
+- WebFlux controllers
+- HTTP routing
+- Validation (`@Valid`)
+- Exception handling
+- Delegates to `transport` handlers
 
+---
+
+### **5. external/**
+Implements **application and domain ports**:
+
+- Repositories (R2DBC, JDBC…)
+- File loaders (Text, JSON…)
+- OpenAI / REST clients
+- Messaging adapters
+
+Contains Spring + technical libraries.
+
+---
+
+### **6. bootstrap/**
+- Main Spring Boot application
+- Global configuration
+- Module wiring
+- Logging configuration
+- Environment setup
+
+---
+
+## 🔗 Request Flow
+
+```
+Client (REST)
+   ↓
+api/                → Controllers
+   ↓
+transport/         → Handlers + Presenters (DTO ↔ Commands)
+   ↓
+application/       → Use Case orchestration
+   ↓
+domain/            → Pure business logic
+   ↓
+external/          → Technical implementations
+   ↑
+application/       ← Builds Result
+   ↑
+transport/         ← Presenter converts Result → DTO
+   ↑
+api/               ← Returns Response
+```
+
+---
+
+## 💡 Key Principles
+
+1. **Domain is pure Java.**
+2. **Application orchestrates use cases.**
+3. **Transport handles mapping only.**
+4. **API handles protocols only.**
+5. **External handles technical details.**
+6. **Dependencies always flow inward.**
+
+> 🧠 *Infrastructure changes. Business rules don’t.*

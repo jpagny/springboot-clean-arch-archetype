@@ -1,316 +1,293 @@
-# 🧩 Clean Architecture Implementation Guideline
+# 🏷️ Clean Architecture Implementation Guideline (Updated)
 
-> **Goal:**  
-> This document defines the conventions and responsibilities for each layer of our **modular Clean Architecture**, from **Entrypoint** to **External Adapters**.  
-> It ensures consistent naming, clear flow of responsibility, and total decoupling between technical and business concerns.
+This document defines the conventions and responsibilities for each layer of our **modular Clean Architecture**, now aligned with the updated structure:
+
+```
+api → transport → application → domain → external → bootstrap
+```
+
+The goal is to enforce **decoupling**, clear **flow of responsibility**, and **framework‑independent business logic**.
 
 ---
 
-## 🛠️ Overview
+# 🧩 Layer Overview
 
 ```
-Entrypoint → Presentation → Application → Domain → External
+api               (Controllers)
+transport         (Handlers + Presenters + DTO Mapping)
+application       (Use Case Orchestration)
+domain            (Pure Business Logic)
+external          (Technical Adapters)
+bootstrap         (Spring Boot Runtime)
 ```
 
-Each layer has **one clear responsibility** and communicates with the next using **well-defined contracts**.  
-Business logic remains framework-independent and testable.
+Each layer contains **one and only one responsibility**, communicating with the next through clear contracts.
 
 ---
 
-## 1️⃣ Entrypoint Layer
+# 1️⃣ API Layer
 
 **Responsibility:**  
-Expose APIs (REST controllers, messaging endpoints, etc.) and delegate to the Presentation layer.  
-No business logic or domain model exposure.
+Expose REST endpoints and forward requests to the *transport* layer.
 
-**Typical package:**  
-`entrypoint.rest.endpoints.<module>.controller`
+**Package:**  
+`api.<feature>.controller`
 
-### ✅ Naming and verbs
-- Controller method verbs must match HTTP semantics (`create`, `update`, `delete`, `get`, `list`, etc.).
-- Delegation to the facade always uses the neutral verb **`present(...)`**.
+### ✅ Rules
+
+- No business logic.
+- No domain references.
+- Only HTTP concerns: routing, validation, error mapping.
+- Delegation to transport uses:
+
+```
+handler.handle(request)
+```
+
+### Example
 
 ```java
 @PostMapping("/examples")
-public ResponseEntity<CreateExampleResponse> create(@RequestBody CreateExampleRequest req) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(facade.present(req));
+public Mono<ResponseEntity<CreateExampleResponse>> create(
+        @Valid @RequestBody CreateExampleRequest req) {
+    return handler.handle(req)
+            .map(ResponseEntity::ok);
 }
 ```
 
-### ✅ Responsibilities
-- Validate input (@Valid, DTO constraints)
-- Handle localization headers / language preferences
-- Map exceptions (via `@RestControllerAdvice`)
-- Log trace IDs for observability
-- Never depend on `domain` or `external` packages directly
-
 ---
 
-## 2️⃣ Presentation Layer
+# 2️⃣ Transport Layer
 
 **Responsibility:**  
-Acts as an **orchestration and mapping layer** between the API (Entrypoint) and the Application layer.  
-Handles DTO ↔ Command ↔ Result ↔ Response conversion and message localization.
+Glue between **API** and **Application**.
 
-**Typical package:**  
-`presentation.representations.<module>.facade`
+Performs:
 
-### ✅ Facade conventions
-- Expose a single, neutral verb **`present(...)`** for controllers.
-- Internally, translate the request into a command and delegate to the Application layer.
+- DTO → Command mapping
+- Command → Use Case invocation
+- Result → Response mapping
+- i18n and error message formatting
+
+**Package:**  
+`transport.endpoints.<feature>.<usecase>`
+
+### 📦 Structure
+
+```
+handler/     → Orchestrates the endpoint flow
+presenter/   → InputPresenter & OutputPresenter
+dto/         → Request and Response objects
+```
+
+### 🔄 Standard Flow
+
+```
+API Request
+   ↓
+InputPresenter.toCommand(request)
+   ↓
+UseCase.process(command)
+   ↓
+OutputPresenter.toResponse(result)
+   ↓
+API Response
+```
+
+### Example
 
 ```java
 @Component
 @RequiredArgsConstructor
-public class ExampleEndpointFacade {
+public class ExampleCreateHandler
+        implements EndpointHandler<CreateExampleRequest, Mono<CreateExampleResponse>> {
 
-    private final InputPresenter<CreateExampleRequest, CreateExampleCommand> inPresenter;
-    private final OutputPresenter<CreateExampleResult, CreateExampleResponse> outPresenter;
-    private final ExampleService app;
+    private final InputPresenter<CreateExampleRequest, CreateExampleCommand> in;
+    private final OutputPresenter<CreateExampleResult, CreateExampleResponse> out;
+    private final ExampleUseCase useCase;
 
-    public CreateExampleResponse present(CreateExampleRequest req) {
-        var cmd = inPresenter.toCommand(req);
-        var result = app.process(cmd);      // delegate to Application
-        return outPresenter.toResponse(result);
+    @Override
+    public Mono<CreateExampleResponse> handle(CreateExampleRequest req) {
+        var cmd = in.toCommand(req);
+        return useCase.process(cmd).map(out::toResponse);
     }
 }
 ```
 
-### ✅ Verbs used between layers
-| From | To | Verb | Description |
-|------|----|------|-------------|
-| Entrypoint | Presentation | `present(...)` | The controller delegates presentation logic |
-| Presentation | Application | `process(...)` | Launch the use case/application workflow |
-
 ---
 
-## 3️⃣ Application Layer
+# 3️⃣ Application Layer
 
 **Responsibility:**  
-Implements the **application flow** and orchestrates **use cases**.  
-Coordinates ports, handles transactions, and translates exceptions.
+Implements **use case orchestration**.
 
-**Typical package:**  
-`application.services.<module>`
+- Coordinates domain services and external ports
+- Manages transactions
+- Uses Reactive (`Mono`, `Flux`) if needed
+- Converts technical errors → business errors
 
-### ✅ Service conventions
-- Each service represents a **module boundary**.
-- Methods use the neutral verb **`process(...)`** to trigger a domain use case.
-- Transactions are managed here (`@Transactional`).
+**Package:**  
+`application.<feature>.usecases`
+
+### 🧠 Naming Convention
+
+Use **`process(...)`** for application service methods.
+
+### Example
 
 ```java
 @Service
 @RequiredArgsConstructor
-public class ExampleServiceImpl implements ExampleService {
+public class CreateExampleUseCaseImpl implements CreateExampleUseCase {
 
-    private final CreateExampleUseCase useCase;
+    private final ExampleRepositoryPort repo;
 
     @Override
     @Transactional
-    public CreateExampleResult process(CreateExampleCommand command) {
-        return useCase.handle(command);
+    public Mono<CreateExampleResult> process(CreateExampleCommand cmd) {
+        return Mono.fromCallable(() -> repo.register(cmd.toDomain()))
+                   .map(CreateExampleResult::new);
     }
 }
 ```
 
-### ✅ Verbs used between layers
-| From | To | Verb | Description |
-|------|----|------|-------------|
-| Presentation | Application | `process(...)` | Start an application flow |
-| Application | Domain | `handle(...)` | Execute a specific domain use case |
-
 ---
 
-## 4️⃣ Domain Layer
+# 4️⃣ Domain Layer
 
 **Responsibility:**  
-Contains **pure business logic** — entities, value objects, domain services, and use cases.  
-No dependencies on Spring, JPA, or any external libraries.
+Contains **pure business rules**.
 
-**Typical package:**  
-`domain.core.<module>`
+- Entities, Value Objects, Aggregates
+- Domain services
+- Domain ports (interfaces)
+- No Spring
+- No WebFlux
+- No annotations
+- No framework dependencies
 
-### ✅ Use Case conventions
-- Each use case defines an **input port interface** named after the business action.
-- Each interface exposes a single method **`handle(...)`**.
+**Package:**  
+`domain.core.<feature>`
 
-```java
-public interface CreateExampleUseCase {
-    CreateExampleResult handle(CreateExampleCommand command);
-}
-```
+### 🧩 Domain Ports
 
-### ✅ Command / Query / Result structure
-| Type | Purpose | Example |
-|-------|----------|---------|
-| **Command** | Write operations | `CreateExampleCommand` |
-| **Query** | Read operations | `GetExampleQuery` |
-| **Result** | Output / Return model | `CreateExampleResult` |
-
-### ✅ Domain exceptions
-All business errors extend `BaseBusinessException` and reference an enum of `IBusinessError`.
-
-```java
-throw new BaseBusinessException(ExampleBusinessError.NAME_ALREADY_TAKEN);
-```
-
----
-
-## 5️⃣ Domain → External (Ports & Adapters)
-
-**Responsibility:**  
-Define and implement interfaces for interactions with external systems  
-(databases, REST clients, message brokers, files, etc.).
-
----
-
-### ✅ Output Ports (domain side)
-Express **business intentions**, not technical operations.
+Ports define business intentions:
 
 ```java
 public interface ExampleRepositoryPort {
     Example register(Example example);
-    Optional<Example> load(ExampleId id);
-    boolean isNameTaken(ExampleName name);
-    List<Example> browse();
-    void remove(ExampleId id);
+    Optional<Example> load(Long id);
+    boolean isNameTaken(String name);
 }
 ```
 
-> ❌ Avoid CRUD or technical verbs (`save`, `findById`, `deleteById`, etc.)
-> ✅ Prefer **domain semantics** (`register`, `load`, `isNameTaken`, `browse`, `remove`)
+### 🧠 Domain Use Case Contracts
+
+Use **`handle(...)`** as the domain-standard verb.
+
+```java
+public interface CreateExampleUseCase {
+    CreateExampleResult handle(CreateExampleCommand cmd);
+}
+```
 
 ---
 
-### ✅ Adapters (infrastructure side)
-Implement ports using the chosen technology (JPA, HTTP, Kafka...).
+# 5️⃣ External Layer
+
+**Responsibility:**  
+Implements *domain* and *application* ports using technical adapters:
+
+- Database (JPA, R2DBC)
+- File system
+- WebClients (OpenAI)
+- Kafka/RabbitMQ
+- Caches
+
+**Package:**  
+`external.<type>.<feature>`
+
+### Example Adapter
 
 ```java
 @Repository
 @RequiredArgsConstructor
 public class ExampleRepositoryAdapter implements ExampleRepositoryPort {
 
-    private final ExampleJpaRepository jpa;
+    private final ExampleR2dbcRepository repo;
     private final ExampleMapper mapper;
 
     @Override
     public Example register(Example example) {
-        var entity = mapper.toEntity(example);
-        var saved = jpa.save(entity);
-        return mapper.toDomain(saved);
-    }
-
-    @Override
-    public Optional<Example> load(ExampleId id) {
-        return jpa.findById(id.value()).map(mapper::toDomain);
-    }
-
-    @Override
-    public boolean isNameTaken(ExampleName name) {
-        return jpa.existsByName(name.value());
-    }
-
-    @Override
-    public List<Example> browse() {
-        return jpa.findAll().stream().map(mapper::toDomain).toList();
-    }
-
-    @Override
-    public void remove(ExampleId id) {
-        jpa.deleteById(id.value());
+        return repo.save(mapper.toEntity(example))
+                   .map(mapper::toDomain)
+                   .block();
     }
 }
 ```
 
 ---
 
-## 6️⃣ Mapping Conventions
+# 6️⃣ Bootstrap Layer
 
-**Mappers** translate between domain objects and infrastructure entities.
+**Responsibility:**  
+Spring Boot application entrypoint + cross-module configuration.
 
-```java
-@Component
-public class ExampleMapper {
-    public ExampleEntity toEntity(Example d) {
-        return new ExampleEntity(d.id().value(), d.name().value());
-    }
+**Package:**  
+`bootstrap`
 
-    public Example toDomain(ExampleEntity e) {
-        return new Example(new ExampleId(e.getId()), new ExampleName(e.getName()));
-    }
-}
+Contains:
+
+- `Application.java`
+- Global bean definitions
+- Cross-cutting configurations (logging, security, mapping)
+
+---
+
+# 🔗 Global Flow Summary
+
+```
+Client REST Call
+   ↓
+api/                     (controller)
+   ↓
+transport/               (handler + presenters)
+   ↓
+application/             (use case orchestration)
+   ↓
+domain/                  (business logic + ports)
+   ↓
+external/                (infra implementations)
+   ↑
+application/             (assemble result)
+   ↑
+transport/               (map result → response)
+   ↑
+api/                     (return HTTP response)
 ```
 
 ---
 
-## 7️⃣ Entity & Repository (External Layer)
+# 🔤 Naming Conventions Summary
 
-### JPA Entity
-```java
-@Entity
-@Table(name = "examples")
-public class ExampleEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, unique = true)
-    private String name;
-}
-```
-
-### JPA Repository
-```java
-public interface ExampleJpaRepository extends JpaRepository<ExampleEntity, Long> {
-    boolean existsByName(String name);
-}
-```
+| Layer | Standard Verb | Meaning |
+|--------|----------------|---------|
+| api → transport | `handle(...)` | Forward a request |
+| transport → application | `process(...)` | Trigger a use case |
+| application → domain | `handle(...)` | Execute business logic |
+| domain → external | domain verbs | Business-focused persistence intentions |
 
 ---
 
-## 8️⃣ Error Handling & Internationalization
+# 🧠 Final Principles
 
-| Concern | Layer | Responsibility |
-|----------|--------|----------------|
-| **Validation** | Entrypoint | Jakarta `@NotBlank`, `@Size`, etc. |
-| **Localization** | Presentation | `MessageSource`, message bundles per module |
-| **Business Errors** | Domain | `BaseBusinessException`, `IBusinessError` |
-| **HTTP Mapping** | Entrypoint | `GlobalExceptionHandler` |
+1. **Domain is pure and framework-free.**
+2. **Transport is the only translation layer.**
+3. **Application coordinates, not computes.**
+4. **External adapters do technical work.**
+5. **Dependencies flow inward only.**
+6. **Errors and i18n belong to transport/API, not domain.**
+7. **Business verbs rule the domain, not CRUD verbs.**
 
----
-
-## 9️⃣ Transaction Boundaries
-
-| Layer | Responsible for Transactions |
-|--------|------------------------------|
-| Entrypoint | ❌ No |
-| Presentation | ❌ No |
-| Application | ✅ Yes (`@Transactional`) |
-| Domain | ❌ No |
-| External | ❌ No (relies on Application) |
-
----
-
-## 🖚 Summary Table
-
-| Direction | Verb | Meaning |
-|------------|------|---------|
-| Entrypoint → Presentation | `present(...)` | Convert and delegate API request |
-| Presentation → Application | `process(...)` | Launch an application workflow |
-| Application → Domain | `handle(...)` | Execute a business use case |
-| Domain → External | domain verbs (`register`, `load`, `remove`, etc.) | Express business-level persistence intentions |
-
----
-
-## 💡 Final Principles
-
-1. **The Domain owns the business language.**
-2. **Each layer has a single responsibility.**
-3. **No cross-layer dependency (except downward direction).**
-4. **Adapters can change without touching the domain.**
-5. **Method verbs reflect purpose, not implementation.**
-
-> 🧠 *"The domain asks — the adapter executes."*
-
----
+> *“The architecture is what remains when you remove frameworks.”*
 

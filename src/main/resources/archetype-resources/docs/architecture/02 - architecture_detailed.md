@@ -11,59 +11,52 @@ The goal is to keep business rules independent of frameworks and I/O, and to iso
 backend/
 ├─ pom.xml                          # Parent POM (packaging = pom)
 │
-├─ domain/                          # Pure business logic (entities, value objects, ports, use cases)
+├─ domain/                          # Pure business logic (entities, value objects, ports)
 │  ├─ pom.xml
 │  └─ src/main/java/com/example/domain/
 │     ├─ core/<context>/            # Each subdomain or bounded context
 │     │  ├─ model/                  # Core domain models: Entities, Value Objects, Aggregates
-│     │  ├─ operations/             # Application-specific actions: Commands, Queries, Results
-│     │  ├─ ports/                  # Input and Output interfaces (use case & persistence contracts)
-│     │  └─ usecases/               # Business rules implementations (pure domain logic)
+│     │  ├─ ports/                  # Domain ports (input/output) — synchronous, framework-free
+│     │  └─ services/               # Domain services (pure business rules)
 │     └─ commons/                   # Shared domain types: base exceptions, error codes, utilities
 │
-├─ application/                     # Use case orchestration layer (transactional boundary)
+├─ application/                     # Use case orchestration layer (reactive allowed)
 │  ├─ pom.xml
 │  └─ src/main/java/com/example/application/
-│     └─ services/<context>/        # Application services calling domain use cases and ports
-│        ├─ impl/                   # Internal implementations (optional)
-│        └─ ...                     # Input commands → domain logic → results mapping
+│     └─ <context>/usecases/        # Orchestrates domain + external ports
+│        ├─ commands/               # Input command models
+│        ├─ queries/                # Query models
+│        ├─ results/                # Output result models
+│        └─ ...                     # Calls pure domain + external implementations
 │
-├─ presentation/                    # Data mapping, i18n, and error management
+├─ transport/                       # DTO mapping layer between API and Application
 │  ├─ pom.xml
-│  ├─ src/main/java/com/example/presentation/
-│  │  ├─ common/                    # Shared configs, message source, i18n, and error resolvers
-│  │  │  ├─ configuration/          # MessageSource, ModelMapper, etc.
-│  │  │  ├─ errors/                 # DefaultErrorResponse + HTTP resolvers
-│  │  │  └─ i18n/                   # BusinessErrorMessageResolver and message translation
-│  │  ├─ config/                    # Bean configurations specific to presentation layer
-│  │  └─ representations/           # Maps API DTOs ↔ domain objects
-│  │     └─ <context>/              # Organized per bounded context (e.g. example/)
-│  │        ├─ input/               # Requests, converters, presenters (inbound)
-│  │        ├─ output/              # Responses, converters, presenters (outbound)
-│  │        └─ facade/              # Orchestrates presentation logic for each context
-│  └─ src/main/resources/i18n/      # Resource bundles for i18n and error messages
+│  └─ src/main/java/com/example/transport/
+│     ├─ common/contracts/          # EndpointHandler, InputPresenter, OutputPresenter
+│     └─ endpoints/<context>/       # Grouped by features
+│        ├─ <usecase>/dto/          # Request/Response DTOs
+│        ├─ <usecase>/presenter/    # Mapping between DTO ↔ Commands/Results
+│        └─ <usecase>/handler/      # Delegates to application layer
 │
-├─ external/                        # Infrastructure adapters (persistence, HTTP, messaging)
+├─ api/                             # Web entrypoint (REST, WebFlux)
+│  ├─ pom.xml
+│  └─ src/main/java/com/example/api/
+│     ├─ controllers/<context>/     # REST controllers for each feature
+│     └─ advice/                    # Global exception translation
+│
+├─ external/                        # Infrastructure adapters (DB, HTTP clients, FS, AI)
 │  ├─ pom.xml
 │  └─ src/main/java/com/example/external/
-│     ├─ persistence/               # Database layer — JPA entities and repository adapters
-│     ├─ httpclient/                # REST client implementations for outbound APIs
-│     └─ messaging/                 # Message brokers (Kafka, RabbitMQ, etc.)
+│     ├─ persistence/               # Database entities + repository implementations
+│     ├─ file/                      # File-system adapters
+│     ├─ openai/                    # OpenAI WebClient adapter
+│     └─ messaging/                 # Kafka/RabbitMQ implementations
 │
-├─ entrypoint/                      # Entry adapters (HTTP, CLI, etc.)
-│  ├─ pom.xml
-│  └─ src/main/java/com/example/entrypoint/
-│     ├─ rest/                      # REST controllers + exception handlers
-│     │  ├─ endpoints/<context>/    # REST API endpoints organized by context
-│     │  └─ advice/                 # Global error handling (delegates to presentation)
-│     └─ config/                    # Web configuration (localization, interceptors, etc.)
-│  └─ src/main/resources/           # Web-layer resources (logging, templates, etc.)
-│
-└─ bootstrap/                       # Application entrypoint and global configuration
+└─ bootstrap/                       # Spring Boot runtime & application wiring
    ├─ pom.xml
    └─ src/main/java/com/example/bootstrap/
       ├─ Application.java            # Main Spring Boot launcher
-      └─ configuration/              # Cross-module configuration (e.g. mappers, filters)
+      └─ configuration/              # Cross-module configuration beans
 ```
 
 ---
@@ -72,58 +65,83 @@ backend/
 
 | Module | Responsibility |
 |---------|----------------|
-| **domain** | Contains **core business logic**: entities, value objects, and domain services. Defines contracts through ports (input/output). Framework-agnostic. |
-| **application** | Coordinates domain interactions. Executes use cases, handles transactions, and manages the lifecycle of domain processes. |
-| **presentation** | Bridges **entrypoint** and **domain** layers: maps DTOs, handles localization (i18n), and formats errors. |
-| **external** | Implements domain output ports (repositories, API clients, messaging) using technical adapters. No domain logic. |
-| **entrypoint** | Exposes APIs and entry mechanisms (REST, CLI). Delegates all logic to presentation. Handles request validation and exception translation. |
-| **bootstrap** | Configures and starts the Spring Boot runtime. Wires all modules together and provides shared bean configuration. |
+| **domain** | Pure business rules. Entities, value objects, domain services, and synchronous domain ports. Zero framework dependency. |
+| **application** | Executes use cases, coordinates domain + external. May use Reactive. Defines application ports for external adapters. |
+| **transport** | Performs DTO mapping: request → command, result → response. Contains presenters and endpoint handlers. |
+| **api** | REST/Web entrypoint using WebFlux. Routing, validation, and exception exposure. Delegates to `transport` handlers. |
+| **external** | Implements ports using infrastructure: database, filesystem, HTTP/OpenAI, messaging. No business logic. |
+| **bootstrap** | Bootstraps the Spring application. Loads global config and wires modules together. |
 
 ---
 
 ## 🔗 Flow Overview
 
 ```
-Entrypoint (REST, Web)
+Client (REST)
    ↓
-Presentation (DTO → Command → Response)
+api/                → Controllers (routing, validation)
    ↓
-Application (Use case orchestration, @Transactional)
+transport/         → Presenters & EndpointHandlers (DTO ↔ Commands)
    ↓
-Domain (Business logic, Entities, Ports)
+application/       → Use cases (orchestration, transactions)
    ↓
-External (Persistence, APIs, Messaging)
+domain/            → Pure business logic (entities, services, ports)
+   ↓
+external/          → Technical implementations (DB, APIs, AI, Files)
+   ↑
+application/       ← Collects and formats results
+   ↑
+transport/         ← Maps Result → Response DTO
+   ↑
+api/               ← Sends HTTP JSON response
 ```
 
 ---
 
 ## 🌍 Internationalization
 
-- All i18n files are stored under `presentation/src/main/resources/i18n/`
-- File naming convention:
-  - `example.properties`, `example_fr.properties` — domain-specific messages
-  - `global_errors.properties`, `global_errors_fr.properties` — shared system errors
-- Messages are loaded dynamically via `MessageResourceConfiguration`
+- All i18n messages are located under:
+
+```
+transport/src/main/resources/i18n/
+```
+
+- Naming conventions:
+    - `feature.properties` / `feature_fr.properties`
+    - `global_errors.properties` / `global_errors_fr.properties`
+
+- Transport layer is responsible for text localization and message lookup.
 
 ---
 
 ## ⚙️ Error Handling
 
-- **Domain** defines error codes and exceptions (e.g. `BaseBusinessException`)
-- **Presentation** layer resolves localized messages and HTTP mappings
-- **Entrypoint** layer exposes unified JSON responses via `GlobalExceptionHandler`
+- **domain**: Pure business exceptions (no HTTP).
+- **application**: May aggregate or convert domain errors.
+- **transport**: Resolves and formats localized error messages.
+- **api**: Maps errors to HTTP status codes and returns structured responses.
+
+Example error flow:
+
+```
+DomainError → Application catches → Transport formats → API returns JSON error
+```
 
 ---
 
 ## 💡 Design Principles
 
-1. Business logic remains **pure and independent** of any framework.
-2. Each module has **a single, well-defined responsibility**.
-3. All dependencies **flow inward** — from infrastructure to domain.
-4. Presentation focuses on **data translation, not logic**.
-5. Technical details (DB, HTTP, Kafka) are **plug-in adapters**.
+1. **Domain is immutable and framework-free.**
+2. **Application orchestrates workflows but contains no presentation logic.**
+3. **Transport converts all external formats (DTOs & messages).**
+4. **API only routes and exposes.**
+5. **External is replaceable and contains all infrastructure details.**
+6. **Dependencies always point inward:**
+   ```
+   external → application → domain
+   api → transport → application → domain
+   ```
 
 ---
 
-> 🧠 *“The architecture is what stays when frameworks and tools change.”*
-
+> 🧠 *“Frameworks are tools. The architecture is what remains when tools evolve.”*
