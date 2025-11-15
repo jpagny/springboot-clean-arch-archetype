@@ -5,5 +5,6 @@ import ${package}.domain.commons.exceptions.codes.ErrorCode;
 public interface IBaseException {
     ErrorCode getCode();
     IBusinessError getBusinessError();
+    String getBusinessCode();
     Object[] getArgs();
 }

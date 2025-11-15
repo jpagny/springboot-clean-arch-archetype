@@ -41,15 +41,17 @@ public class GlobalExceptionHandler {
 
         var message = buildValidationMessage(ex);
         var traceId = MDC.get(TRACE_ID_KEY);
-        var status  = HttpStatus.BAD_REQUEST;
+        var status = HttpStatus.BAD_REQUEST;
+        var path = request.getRequestURI();
 
-        log.error("[VALIDATION_ERROR] path='{}' traceId='{}' -> {}", request.getRequestURI(), traceId, message);
+        log.error("[VALIDATION_ERROR] path='{}' traceId='{}' -> {}", path, traceId, message);
 
         var body = DefaultErrorResponse.of(
                 VALIDATION_ERROR_CODE,
+                null,
                 message,
                 status.value(),
-                request.getRequestURI(),
+                path,
                 traceId
         );
         return ResponseEntity.status(status).body(body);
@@ -58,17 +60,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BaseBusinessException.class)
     public ResponseEntity<DefaultErrorResponse> handleBaseBusinessException(BaseBusinessException ex,
                                                                             HttpServletRequest request) {
-        var locale  = request.getLocale() != null ? request.getLocale() : Locale.getDefault();
+        var locale = request.getLocale() != null ? request.getLocale() : Locale.getDefault();
         var traceId = MDC.get(TRACE_ID_KEY);
-        var path    = request.getRequestURI();
+        var path = request.getRequestURI();
 
         var status    = httpStatusResolver.resolve(ex.getCode());
         var localized = businessErrorMessageResolver.resolve(ex.getBusinessError(), locale, ex.getArgs());
 
-        log.error("[BUSINESS_ERROR] code='{}' path='{}' traceId='{}' message='{}' args={}",
-                ex.getCode(), path, traceId, localized, ex.getArgs(), ex);
+        log.error("[BUSINESS_ERROR] code='{}' business='{}' path='{}' traceId='{}' message='{}' args={}",
+                ex.getCode(), ex.getBusinessCode(), path, traceId, localized, ex.getArgs(), ex);
 
-        var body = DefaultErrorResponse.of(ex.getCode().name(), localized, status.value(), path, traceId);
+        var body = DefaultErrorResponse.of(
+                ex.getCode().name(),
+                ex.getBusinessCode(),
+                localized,
+                status.value(),
+                path,
+                traceId
+        );
 
         return ResponseEntity.status(status).body(body);
     }
@@ -76,13 +85,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<DefaultErrorResponse> handleUnexpectedException(Exception ex, HttpServletRequest request) {
         var traceId = MDC.get(TRACE_ID_KEY);
-        var path    = request.getRequestURI();
-        var status  = HttpStatus.INTERNAL_SERVER_ERROR;
+        var path = request.getRequestURI();
+        var status = HttpStatus.INTERNAL_SERVER_ERROR;
 
         log.error("[UNEXPECTED_ERROR] path='{}' traceId='{}' -> {}", path, traceId, ex.getMessage(), ex);
 
         var body = DefaultErrorResponse.of(
                 ex.getClass().getSimpleName(),
+                null,
                 ex.getMessage(),
                 status.value(),
                 path,
@@ -97,8 +107,8 @@ public class GlobalExceptionHandler {
 
         ex.getBindingResult().getFieldErrors().forEach(fe -> {
             var field = fe.getField();
-            var code  = fe.getCode();
-            var msg   = fe.getDefaultMessage();
+            var code = fe.getCode();
+            var msg = fe.getDefaultMessage();
 
             if (!perField.containsKey(field)) {
                 perField.put(field, code + FIELD_PAYLOAD_SEPARATOR + msg);

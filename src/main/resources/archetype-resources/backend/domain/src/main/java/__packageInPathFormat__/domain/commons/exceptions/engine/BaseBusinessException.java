@@ -34,4 +34,12 @@ public class BaseBusinessException extends RuntimeException implements IBaseExce
         return businessError;
     }
 
+    @Override
+    public String getBusinessCode() {
+        if (businessError instanceof Enum<?> e) {
+            return e.name();
+        }
+        return businessError.getClass().getSimpleName();
+    }
+
 }
