@@ -8,9 +8,7 @@
         <requiredProperty key="version">
             <defaultValue>0.0.1-SNAPSHOT</defaultValue>
         </requiredProperty>
-        <requiredProperty key="package">
-            <defaultValue>com.example</defaultValue>
-        </requiredProperty>
+        <requiredProperty key="package"/>
     </requiredProperties>
 
     <fileSets>
