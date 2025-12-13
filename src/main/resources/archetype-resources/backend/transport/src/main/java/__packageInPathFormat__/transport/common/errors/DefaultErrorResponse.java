@@ -21,6 +21,6 @@ public record DefaultErrorResponse(
     }
 
     public static DefaultErrorResponse of(String code, String businessCode, String message, int status, String path, String traceId) {
-        return new DefaultErrorResponse(code, message, status, path, traceId, Instant.now());
+        return new DefaultErrorResponse(code, businessCode, message, status, path, traceId, Instant.now());
     }
 }
