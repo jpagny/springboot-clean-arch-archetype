@@ -1,4 +1,4 @@
-package ${package}.entrypoint.rest.common.advice;
+package ${package}.api.rest.advice;
 
 import ${package}.domain.commons.exceptions.engine.BaseBusinessException;
 import ${package}.transport.common.errors.DefaultErrorResponse;
