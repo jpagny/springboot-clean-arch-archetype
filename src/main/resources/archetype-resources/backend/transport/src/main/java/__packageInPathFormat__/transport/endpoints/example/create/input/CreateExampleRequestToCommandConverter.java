@@ -1,7 +1,7 @@
-package ${package}.transport.endpoints.example.create.input.converters;
+package ${package}.transport.endpoints.example.create.input;
 
-import ${package}.transport.common.qualifier.PresentationConverter;
-import ${package}.transport.endpoints.example.create.input.requests.CreateExampleRequest;
+{package}.transport.common.qualifier.PresentationConverter;
+{package}.transport.endpoints.example.create.input.requests.CreateExampleRequest;
 import ${package}.domain.core.example.operations.commands.CreateExampleCommand;
 import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;

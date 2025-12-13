@@ -1,4 +1,4 @@
-package ${package}.transport.endpoints.example.create.input.requests;
+package ${package}.transport.endpoints.example.create.input;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

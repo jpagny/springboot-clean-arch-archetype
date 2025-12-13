@@ -1,8 +1,8 @@
-package ${package}.transport.endpoints.example.create.output.presenters;
+package ${package}.transport.endpoints.example.create.output;
 
 import ${package}.transport.common.contracts.OutputPresenter;
-import ${package}.domain.core.example.operations.results.CreateExampleResult;
-import ${package}.transport.endpoints.example.create.output.responses.CreateExampleResponse;
+{package}.domain.core.example.operations.results.CreateExampleResult;
+{package}.transport.endpoints.example.create.output.responses.CreateExampleResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
