@@ -1,6 +1,6 @@
-package ${package}.domain.commons.crud.usecases;
+package ${package}.domain.commons.crud.usecases.impl;
 
-import ${package}.domain.commons.crud.ports.input.CreateUseCase;
+{package}.domain.commons.crud.ports.input.CreateUseCase;
 import ${package}.domain.commons.crud.ports.output.RepositoryPort;
 
 import java.util.Objects;

@@ -1,9 +1,9 @@
-package ${package}.domain.commons.crud.usecases;
+package ${package}.domain.commons.crud.usecases.impl;
 
 import ${package}.domain.commons.crud.ports.input.ListUseCase;
-import ${package}.domain.commons.crud.ports.output.RepositoryPort;
-import ${package}.domain.commons.pagination.Page;
-import ${package}.domain.commons.pagination.PageRequest;
+{package}.domain.commons.crud.ports.output.RepositoryPort;
+{package}.domain.commons.pagination.Page;
+{package}.domain.commons.pagination.PageRequest;
 
 import java.util.Objects;
 

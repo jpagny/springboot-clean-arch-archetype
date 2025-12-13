@@ -1,7 +1,7 @@
-package ${package}.domain.commons.crud.usecases;
+package ${package}.domain.commons.crud.usecases.impl;
 
 import ${package}.domain.commons.crud.ports.input.DeleteUseCase;
-import ${package}.domain.commons.crud.ports.output.RepositoryPort;
+{package}.domain.commons.crud.ports.output.RepositoryPort;
 
 import java.util.Objects;
 
