@@ -1,3 +1,12 @@
+package ${package}.domain.commons.crud.usecases;
+
+import ${package}.domain.commons.crud.ports.input.ListUseCase;
+import ${package}.domain.commons.crud.ports.output.RepositoryPort;
+import ${package}.domain.commons.pagination.Page;
+import ${package}.domain.commons.pagination.PageRequest;
+
+import java.util.Objects;
+
 public abstract class AbstractListUseCase<M, ID, RES>
         implements ListUseCase<RES> {
 

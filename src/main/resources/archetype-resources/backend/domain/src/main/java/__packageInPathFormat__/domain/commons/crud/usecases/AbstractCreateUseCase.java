@@ -1,3 +1,10 @@
+package ${package}.domain.commons.crud.usecases;
+
+import ${package}.domain.commons.crud.ports.input.CreateUseCase;
+import ${package}.domain.commons.crud.ports.output.RepositoryPort;
+
+import java.util.Objects;
+
 public abstract class AbstractCreateUseCase<M, ID, CMD, RES>
         implements CreateUseCase<CMD, RES> {
 

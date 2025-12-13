@@ -1,3 +1,11 @@
+package ${package}.domain.commons.crud.usecases;
+
+import ${package}.domain.commons.crud.ports.input.GetByIdUseCase;
+import ${package}.domain.commons.crud.ports.output.RepositoryPort;
+
+import java.util.Objects;
+import java.util.Optional;
+
 public abstract class AbstractGetByIdUseCase<M, ID, RES>
         implements GetByIdUseCase<ID, RES> {
 
