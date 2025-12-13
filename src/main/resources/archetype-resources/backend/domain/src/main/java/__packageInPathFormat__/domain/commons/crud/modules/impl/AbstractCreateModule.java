@@ -1,16 +1,16 @@
-package ${package}.domain.commons.crud.usecases.impl;
+package ${package}.domain.commons.crud.modules.impl;
 
-{package}.domain.commons.crud.ports.input.CreateUseCase;
+import ${package}.domain.commons.crud.modules.CrudModules;
 import ${package}.domain.commons.crud.ports.output.RepositoryPort;
 
 import java.util.Objects;
 
-public abstract class AbstractCreateUseCase<M, ID, CMD, RES>
-        implements CreateUseCase<CMD, RES> {
+public abstract class AbstractCreateModule<M, ID, CMD, RES>
+        implements CrudModules.Create<CMD, RES> {
 
     private final RepositoryPort<M, ID> repository;
 
-    protected AbstractCreateUseCase(RepositoryPort<M, ID> repository) {
+    protected AbstractCreateModule(RepositoryPort<M, ID> repository) {
         this.repository = Objects.requireNonNull(repository);
     }
 

@@ -1,16 +1,16 @@
-package ${package}.domain.commons.crud.usecases.impl;
+package ${package}.domain.commons.crud.modules.impl;
 
-import ${package}.domain.commons.crud.ports.input.UpdateUseCase;
-{package}.domain.commons.crud.ports.output.RepositoryPort;
+import ${package}.domain.commons.crud.modules.CrudModules;
+import ${package}.domain.commons.crud.ports.output.RepositoryPort;
 
 import java.util.Objects;
 
-public abstract class AbstractUpdateUseCase<M, ID, CMD, RES>
-        implements UpdateUseCase<ID, CMD, RES> {
+public abstract class AbstractUpdateModule<M, ID, CMD, RES>
+        implements CrudModules.Update<ID, CMD, RES> {
 
     private final RepositoryPort<M, ID> repository;
 
-    protected AbstractUpdateUseCase(RepositoryPort<M, ID> repository) {
+    protected AbstractUpdateModule(RepositoryPort<M, ID> repository) {
         this.repository = Objects.requireNonNull(repository);
     }
 

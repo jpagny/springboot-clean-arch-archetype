@@ -1,10 +1,9 @@
 package ${package}.transport.endpoints.example.create.output;
 
-{package}.transport.common.qualifier.PresentationConverter;
-import ${package}.transport.endpoints.example.create.output.responses.CreateExampleResponse;
-{package}.domain.core.example.messages.ExampleMessageKey;
-{package}.transport.endpoints.example.create.resolver.ExampleMessageResolver;
-{package}.domain.core.example.operations.results.CreateExampleResult;
+import ${package}.transport.common.qualifier.PresentationConverter;
+import ${package}.domain.core.example.messages.ExampleMessageKey;
+import ${package}.transport.endpoints.example.create.resolver.ExampleMessageResolver;
+import ${package}.domain.core.example.operations.results.CreateExampleResult;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;

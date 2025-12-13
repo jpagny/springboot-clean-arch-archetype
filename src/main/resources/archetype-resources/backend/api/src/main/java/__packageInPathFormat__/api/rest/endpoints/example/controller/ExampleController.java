@@ -1,8 +1,8 @@
 package ${package}.api.rest.endpoints.example.controller;
 
 import ${package}.transport.endpoints.example.create.ExampleCreateEndpointHandler;
-import ${package}.transport.endpoints.example.create.input.requests.CreateExampleRequest;
-import ${package}.transport.endpoints.example.create.output.responses.CreateExampleResponse;
+import ${package}.transport.endpoints.example.create.input.CreateExampleRequest;
+import ${package}.transport.endpoints.example.create.output.CreateExampleResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

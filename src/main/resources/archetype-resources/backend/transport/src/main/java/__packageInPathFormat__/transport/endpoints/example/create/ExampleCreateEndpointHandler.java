@@ -4,8 +4,8 @@ import ${package}.transport.common.contracts.EndpointHandler;
 import ${package}.transport.common.contracts.InputPresenter;
 import ${package}.transport.common.contracts.OutputPresenter;
 import ${package}.application.services.example.ExampleService;
-import ${package}.transport.endpoints.example.create.input.requests.CreateExampleRequest;
-import ${package}.transport.endpoints.example.create.output.responses.CreateExampleResponse;
+import ${package}.transport.endpoints.example.create.input.CreateExampleRequest;
+import ${package}.transport.endpoints.example.create.output.CreateExampleResponse;
 import ${package}.domain.core.example.operations.commands.CreateExampleCommand;
 import ${package}.domain.core.example.operations.results.CreateExampleResult;
 

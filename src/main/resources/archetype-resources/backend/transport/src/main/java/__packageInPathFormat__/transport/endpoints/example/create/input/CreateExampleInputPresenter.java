@@ -1,9 +1,7 @@
 package ${package}.transport.endpoints.example.create.input;
 
-{package}.transport.common.contracts.InputPresenter;
-import ${package}.transport.endpoints.example.create.input.requests.CreateExampleRequest;
-{package}.domain.core.example.operations.commands.CreateExampleCommand;
-import lombok.RequiredArgsConstructor;
+import ${package}.transport.common.contracts.InputPresenter;
+import ${package}.domain.core.example.operations.commands.CreateExampleCommand;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;

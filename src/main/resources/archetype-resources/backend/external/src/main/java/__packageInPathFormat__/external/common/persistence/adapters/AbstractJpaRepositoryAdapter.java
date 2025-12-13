@@ -3,6 +3,7 @@ package ${package}.external.common.persistence.adapters;
 import ${package}.domain.commons.crud.ports.output.RepositoryPort;
 import ${package}.domain.commons.pagination.Page;
 import ${package}.domain.commons.pagination.PageRequest;
+import ${package}.domain.commons.pagination.Sort;
 import ${package}.external.common.persistence.mapping.IdMapper;
 import ${package}.external.common.persistence.mapping.PersistenceMapper;
 import org.springframework.data.domain.Pageable;
@@ -50,7 +51,14 @@ public abstract class AbstractJpaRepositoryAdapter<M, ID, E, DBID>
         var page = jpa.findAll(pageable);
 
         var items = page.getContent().stream().map(mapper::toModel).toList();
-        return new Page<>(items, page.getTotalElements(), pr.page(), pr.size());
+        return new Page<>(
+                items,
+                page.getTotalElements(),
+                page.getTotalPages(),
+                pr.page(),
+                pr.size(),
+                Sort.unsorted()
+        );
     }
 
     @Override

@@ -1,17 +1,17 @@
-package ${package}.domain.commons.crud.usecases.impl;
+package ${package}.domain.commons.crud.modules.impl;
 
-{package}.domain.commons.crud.ports.input.GetByIdUseCase;
+import ${package}.domain.commons.crud.modules.CrudModules;
 import ${package}.domain.commons.crud.ports.output.RepositoryPort;
 
 import java.util.Objects;
 import java.util.Optional;
 
-public abstract class AbstractGetByIdUseCase<M, ID, RES>
-        implements GetByIdUseCase<ID, RES> {
+public abstract class AbstractGetByIdModule<M, ID, RES>
+        implements CrudModules.GetById<ID, RES> {
 
     private final RepositoryPort<M, ID> repository;
 
-    protected AbstractGetByIdUseCase(RepositoryPort<M, ID> repository) {
+    protected AbstractGetByIdModule(RepositoryPort<M, ID> repository) {
         this.repository = Objects.requireNonNull(repository);
     }
 

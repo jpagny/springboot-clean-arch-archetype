@@ -1,16 +1,16 @@
-package ${package}.domain.commons.crud.usecases.impl;
+package ${package}.domain.commons.crud.modules.impl;
 
-import ${package}.domain.commons.crud.ports.input.DeleteUseCase;
-{package}.domain.commons.crud.ports.output.RepositoryPort;
+import ${package}.domain.commons.crud.modules.CrudModules;
+import ${package}.domain.commons.crud.ports.output.RepositoryPort;
 
 import java.util.Objects;
 
-public abstract class AbstractDeleteUseCase<M, ID>
-        implements DeleteUseCase<ID> {
+public abstract class AbstractDeleteModule<M, ID>
+        implements CrudModules.Delete<ID> {
 
     private final RepositoryPort<M, ID> repository;
 
-    protected AbstractDeleteUseCase(RepositoryPort<M, ID> repository) {
+    protected AbstractDeleteModule(RepositoryPort<M, ID> repository) {
         this.repository = Objects.requireNonNull(repository);
     }
 
