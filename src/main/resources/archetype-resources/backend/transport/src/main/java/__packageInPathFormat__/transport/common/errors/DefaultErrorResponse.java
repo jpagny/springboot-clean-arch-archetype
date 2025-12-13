@@ -8,6 +8,7 @@ import java.time.Instant;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record DefaultErrorResponse(
         String code,
+        String businessCode,
         String message,
         Integer status,
         String path,
@@ -15,11 +16,11 @@ public record DefaultErrorResponse(
         @JsonFormat(shape = JsonFormat.Shape.STRING)
         Instant timestamp
 ) {
-    public static DefaultErrorResponse of(String code, String message) {
-        return new DefaultErrorResponse(code, message, null, null, null, Instant.now());
+    public static DefaultErrorResponse of(String code, String businessCode, String message) {
+        return new DefaultErrorResponse(code, businessCode, message, null, null, null, Instant.now());
     }
 
-    public static DefaultErrorResponse of(String code, String message, int status, String path, String traceId) {
+    public static DefaultErrorResponse of(String code, String businessCode, String message, int status, String path, String traceId) {
         return new DefaultErrorResponse(code, message, status, path, traceId, Instant.now());
     }
 }
