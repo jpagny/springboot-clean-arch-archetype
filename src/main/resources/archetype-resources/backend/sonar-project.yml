@@ -1,0 +1,22 @@
+sonar:
+  projectKey: ${artifactId}
+  projectName: ${artifactId}
+  projectVersion: ${version}
+
+  sourceEncoding: UTF-8
+
+  sources: .
+  tests: .
+
+  java:
+    binaries: "**/target/classes"
+    test:
+      binaries: "**/target/test-classes"
+
+  exclusions:
+    - "**/target/**"
+    - "**/generated/**"
+
+  test:
+    inclusions:
+      - "**/*Test.java"

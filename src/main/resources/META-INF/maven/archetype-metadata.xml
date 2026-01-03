@@ -86,6 +86,14 @@
             </includes>
         </fileSet>
 
+        <!-- ===================== SONAR ===================== -->
+        <fileSet filtered="true" packaged="false">
+            <directory>backend</directory>
+            <includes>
+                <include>sonar-project.yml</include>
+            </includes>
+        </fileSet>
+
         <!-- ===================== DOCS ===================== -->
         <fileSet>
             <directory>docs</directory>
