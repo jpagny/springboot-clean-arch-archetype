@@ -8,10 +8,35 @@ import org.springframework.stereotype.Component;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * Default implementation of {@link ErrorCodeToHttpStatusResolver}.
+ *
+ * <p>
+ * This component provides a predefined mapping between domain-level
+ * {@link ErrorCode} values and HTTP {@link HttpStatus} codes.
+ * </p>
+ *
+ * <p>
+ * It belongs to the transport layer and ensures that domain error codes
+ * are translated into appropriate HTTP semantics without introducing
+ * HTTP dependencies into the domain.
+ * </p>
+ *
+ * <p>
+ * Unmapped error codes are resolved to {@link HttpStatus#BAD_REQUEST}
+ * by default. A {@code null} error code results in
+ * {@link HttpStatus#INTERNAL_SERVER_ERROR}.
+ * </p>
+ */
 @Component
-public class DefaultErrorCodeToHttpStatusResolverImpl implements ErrorCodeToHttpStatusResolver {
+public class DefaultErrorCodeToHttpStatusResolverImpl
+        implements ErrorCodeToHttpStatusResolver {
 
-    private static final Map<ErrorCode, HttpStatus> MAP = new EnumMap<>(ErrorCode.class);
+    /**
+     * Static mapping between domain error codes and HTTP status codes.
+     */
+    private static final Map<ErrorCode, HttpStatus> MAP =
+            new EnumMap<>(ErrorCode.class);
 
     static {
         MAP.put(ErrorCode.FORBIDDEN, HttpStatus.FORBIDDEN);
@@ -23,9 +48,18 @@ public class DefaultErrorCodeToHttpStatusResolverImpl implements ErrorCodeToHttp
         MAP.put(ErrorCode.EMPTY_VALUE, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Default constructor.
+     */
     public DefaultErrorCodeToHttpStatusResolverImpl() {
     }
 
+    /**
+     * Resolves the HTTP status corresponding to the given domain error code.
+     *
+     * @param code the domain error code
+     * @return the resolved {@link HttpStatus}
+     */
     @Override
     public HttpStatus resolve(ErrorCode code) {
         if (code == null) {
