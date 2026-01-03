@@ -42,7 +42,6 @@
         <module>bootstrap</module>
     </modules>
 
-    <!-- Gestion des versions de quelques deps "hors BOM" -->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -62,7 +61,6 @@
     <build>
         <pluginManagement>
             <plugins>
-                <!-- Compile tous les modules avec Java 21 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -72,26 +70,23 @@
                     </configuration>
                 </plugin>
 
-                <!-- Plugins de test (optionnels mais conseillés) -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.2.5</version>
                 </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>3.2.5</version>
                 </plugin>
 
-                <!-- Spring Boot plugin : ne l’active que dans le module "bootstrap" -->
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <!-- pas de configuration ici : le module "bootstrap" l’appliquera -->
                 </plugin>
 
-                <!-- (Optionnel) Enforcer : exige Java 21 au build -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
@@ -114,4 +109,5 @@
             </plugins>
         </pluginManagement>
     </build>
+
 </project>
