@@ -1,15 +1,14 @@
 # ${artifactId} (generated from clean-arch-archetype)
 
 ## Modules
-- `${artifactId}-domain`: entités, ports, use-cases
-- `${artifactId}-application`: mappers, invokers (orchestrateurs)
-- `${artifactId}-api`: contrôleurs web et DTO
-- `${artifactId}-infrastructure`: adapters JPA/HTTP/Messaging
-- `${artifactId}-bootstrap`: application Spring Boot runnable
+- `${artifactId}-domain`: entities/models, ports, use cases (business rules)
+- `${artifactId}-application`: orchestrators/invokers, application services, coordination
+- `${artifactId}-transport`: presenters/mappers between API and application (commands/results ↔ DTOs), error & i18n helpers
+- `${artifactId}-api`: web controllers and API DTOs (REST endpoints)
+- `${artifactId}-infrastructure`: external adapters (JPA/HTTP/Messaging, persistence implementations)
+- `${artifactId}-bootstrap`: runnable Spring Boot application (wiring/configuration)
 
-## Démarrer
+## Run
 ```bash
 mvn -q -DskipTests package
 java -jar bootstrap/target/${artifactId}-bootstrap-${version}.jar
-curl http://localhost:8080/health
-```
