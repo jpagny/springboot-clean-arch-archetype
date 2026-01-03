@@ -3,12 +3,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Parent Spring Boot : gère les versions des deps/plugins -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.3.4</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
 
     <groupId>${groupId}</groupId>
@@ -17,22 +16,17 @@
     <packaging>pom</packaging>
     <name>${artifactId} :: parent</name>
 
-    <!-- Propriétés communes -->
     <properties>
-        <!-- Java pour tous les modules -->
         <java.version>21</java.version>
-        <!-- Optionnel, mais explicite pour maven-compiler-plugin -->
         <maven.compiler.release>${java.version}</maven.compiler.release>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <!-- Libs optionnelles centralisées -->
         <lombok.version>1.18.32</lombok.version>
         <modelmapper.version>3.2.0</modelmapper.version>
     </properties>
 
-    <!-- Modules enfants -->
     <modules>
         <module>domain</module>
         <module>application</module>

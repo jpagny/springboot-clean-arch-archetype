@@ -1,9 +1,9 @@
 server:
-  port: ${SERVER_PORT:0}
+  port: 0
 
 spring:
   application:
-    name: ${SPRING_APPLICATION_NAME:${project.artifactId}}
+    name: ${artifactId}
 
   messages:
     basename: i18n/messages
