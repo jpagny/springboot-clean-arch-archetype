@@ -1,0 +1,78 @@
+######################################################################
+# 🩺 ACTUATOR — HEALTH & INFO
+######################################################################
+
+### 🇬🇧 Health check — global
+GET {{baseUrl}}/actuator/health
+Accept: application/json
+
+### Health check — details (if enabled)
+GET {{baseUrl}}/actuator/health/details
+Accept: application/json
+
+
+######################################################################
+# ℹ️ ACTUATOR — INFO
+######################################################################
+
+### Application info
+GET {{baseUrl}}/actuator/info
+Accept: application/json
+
+
+######################################################################
+# 📊 ACTUATOR — METRICS
+######################################################################
+
+### List available metrics
+GET {{baseUrl}}/actuator/metrics
+Accept: application/json
+
+### JVM memory used
+GET {{baseUrl}}/actuator/metrics/jvm.memory.used
+Accept: application/json
+
+### HTTP server requests
+GET {{baseUrl}}/actuator/metrics/http.server.requests
+Accept: application/json
+
+
+######################################################################
+# 🧵 ACTUATOR — THREADS
+######################################################################
+
+### Thread dump
+GET {{baseUrl}}/actuator/threaddump
+Accept: application/json
+
+
+######################################################################
+# 📦 ACTUATOR — ENV / CONFIG (DEV ONLY)
+######################################################################
+
+### Environment properties (DEV only)
+GET {{baseUrl}}/actuator/env
+Accept: application/json
+
+
+### Configuration properties (DEV only)
+GET {{baseUrl}}/actuator/configprops
+Accept: application/json
+
+
+######################################################################
+# 🔍 ACTUATOR — LOGGERS
+######################################################################
+
+### List loggers
+GET {{baseUrl}}/actuator/loggers
+Accept: application/json
+
+
+### Change log level (example: DEBUG)
+POST {{baseUrl}}/actuator/loggers/root
+Content-Type: application/json
+
+{
+  "configuredLevel": "DEBUG"
+}
