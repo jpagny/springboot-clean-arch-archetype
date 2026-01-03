@@ -1,0 +1,12 @@
+openapi: 3.0.3
+
+info:
+  title: ${artifactId} API
+  version: ${version}
+
+servers:
+    #- url: http://localhost:xxx
+
+paths: {}
+
+components: {}
