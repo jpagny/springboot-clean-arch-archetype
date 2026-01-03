@@ -6,9 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Framework-free sort model for paging queries.
- */
 public final class Sort implements Serializable {
     public enum Direction { ASC, DESC }
 

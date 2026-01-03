@@ -3,7 +3,6 @@ package ${package}.external.common.persistence.adapters;
 import ${package}.domain.commons.crud.ports.output.RepositoryPort;
 import ${package}.domain.commons.pagination.Page;
 import ${package}.domain.commons.pagination.PageRequest;
-import ${package}.domain.commons.pagination.Sort;
 import ${package}.external.common.persistence.mapping.IdMapper;
 import ${package}.external.common.persistence.mapping.PersistenceMapper;
 import org.springframework.data.domain.Pageable;
@@ -18,15 +17,18 @@ public abstract class AbstractJpaRepositoryAdapter<M, ID, E, DBID>
     private final JpaRepository<E, DBID> jpa;
     private final PersistenceMapper<M, E> mapper;
     private final IdMapper<ID, DBID> idMapper;
+    private final SpringSortMapper sortMapper;
 
     protected AbstractJpaRepositoryAdapter(
             JpaRepository<E, DBID> jpa,
             PersistenceMapper<M, E> mapper,
-            IdMapper<ID, DBID> idMapper
+            IdMapper<ID, DBID> idMapper,
+            SpringSortMapper sortMapper
     ) {
-        this.jpa = Objects.requireNonNull(jpa);
-        this.mapper = Objects.requireNonNull(mapper);
-        this.idMapper = Objects.requireNonNull(idMapper);
+        this.jpa = Objects.requireNonNull(jpa, "jpa");
+        this.mapper = Objects.requireNonNull(mapper, "mapper");
+        this.idMapper = Objects.requireNonNull(idMapper, "idMapper");
+        this.sortMapper = Objects.requireNonNull(sortMapper, "sortMapper");
     }
 
     @Override
@@ -47,17 +49,22 @@ public abstract class AbstractJpaRepositoryAdapter<M, ID, E, DBID>
 
     @Override
     public Page<M> findAll(PageRequest pr) {
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(pr.page(), pr.size());
-        var page = jpa.findAll(pageable);
+        var pageable = org.springframework.data.domain.PageRequest.of(
+                pr.page(),
+                pr.size(),
+                sortMapper.toSpringSort(pr.sort())
+        );
 
+        var page = jpa.findAll(pageable);
         var items = page.getContent().stream().map(mapper::toModel).toList();
+
         return new Page<>(
                 items,
                 page.getTotalElements(),
                 page.getTotalPages(),
                 pr.page(),
                 pr.size(),
-                Sort.unsorted()
+                pr.sort()
         );
     }
 

@@ -2,9 +2,6 @@ package ${package}.domain.commons.pagination;
 
 import java.io.Serializable;
 
-/**
- * Framework-free page request model.
- */
 public record PageRequest(int page, int size, Sort sort) implements Serializable {
     public PageRequest {
         if (page < 0) throw new IllegalArgumentException("page must be >= 0");

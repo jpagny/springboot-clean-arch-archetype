@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Framework-free page result model.
- */
 public record Page<T>(
         List<T> content,
         long totalElements,
