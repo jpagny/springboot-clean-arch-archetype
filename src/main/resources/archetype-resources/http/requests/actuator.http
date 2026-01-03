@@ -6,10 +6,6 @@
 GET {{baseUrl}}/actuator/health
 Accept: application/json
 
-### Health check — details (if enabled)
-GET {{baseUrl}}/actuator/health/details
-Accept: application/json
-
 
 ######################################################################
 # ℹ️ ACTUATOR — INFO
