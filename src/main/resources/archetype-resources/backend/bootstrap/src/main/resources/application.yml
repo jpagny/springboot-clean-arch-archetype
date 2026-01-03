@@ -10,8 +10,18 @@ spring:
     encoding: UTF-8
     fallback-to-system-locale: false
 
+  datasource:
+    hikari:
+      minimum-idle: 1
+      maximum-pool-size: 10
+
   jpa:
+    hibernate:
+      ddl-auto: none
     open-in-view: false
+
+  flyway:
+    enabled: true
 
 management:
   endpoints:
