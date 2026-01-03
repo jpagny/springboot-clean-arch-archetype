@@ -18,7 +18,7 @@ import java.util.Optional;
 public interface CrudModules {
 
     /**
-     * Contract for creating a domain entity or aggregate.
+     * Contract for creating a domain model or aggregate.
      *
      * @param <CMD> the command object containing creation data
      * @param <RES> the result type returned after creation
@@ -28,16 +28,16 @@ public interface CrudModules {
         /**
          * Handles the creation use case.
          *
-         * @param command the command containing the data required to create the entity
-         * @return the created entity representation
+         * @param command the command containing the data required to create the model
+         * @return the created model representation
          */
         RES handle(CMD command);
     }
 
     /**
-     * Contract for updating an existing domain entity or aggregate.
+     * Contract for updating an existing domain model or aggregate.
      *
-     * @param <ID>  the identifier type of the entity
+     * @param <ID>  the identifier type of the model
      * @param <CMD> the command object containing update data
      * @param <RES> the result type returned after update
      */
@@ -46,26 +46,26 @@ public interface CrudModules {
         /**
          * Handles the update use case.
          *
-         * @param id      the unique identifier of the entity to update
+         * @param id      the unique identifier of the model to update
          * @param command the command containing updated data
-         * @return the updated entity representation
+         * @return the updated model representation
          */
         RES handle(ID id, CMD command);
     }
 
     /**
-     * Contract for retrieving a domain entity by its identifier.
+     * Contract for retrieving a domain model by its identifier.
      *
-     * @param <ID>  the identifier type of the entity
-     * @param <RES> the result type returned if the entity exists
+     * @param <ID>  the identifier type of the model
+     * @param <RES> the result type returned if the model exists
      */
     interface GetById<ID, RES> {
 
         /**
          * Handles the retrieval use case.
          *
-         * @param id the unique identifier of the entity
-         * @return an {@link Optional} containing the entity if found, otherwise empty
+         * @param id the unique identifier of the model
+         * @return an {@link Optional} containing the model if found, otherwise empty
          */
         Optional<RES> handle(ID id);
     }
@@ -87,16 +87,16 @@ public interface CrudModules {
     }
 
     /**
-     * Contract for deleting a domain entity by its identifier.
+     * Contract for deleting a domain model by its identifier.
      *
-     * @param <ID> the identifier type of the entity
+     * @param <ID> the identifier type of the model
      */
     interface Delete<ID> {
 
         /**
          * Handles the deletion use case.
          *
-         * @param id the unique identifier of the entity to delete
+         * @param id the unique identifier of the model to delete
          */
         void handle(ID id);
     }

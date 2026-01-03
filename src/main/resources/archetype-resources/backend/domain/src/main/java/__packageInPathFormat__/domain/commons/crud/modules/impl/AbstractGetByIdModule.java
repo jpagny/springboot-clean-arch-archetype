@@ -29,7 +29,7 @@ import java.util.Optional;
  *
  * @param <M>   the domain model or aggregate root type
  * @param <ID>  the identifier type of the model
- * @param <RES> the result type returned when the entity is found
+ * @param <RES> the result type returned when the model is found
  */
 public abstract class AbstractGetByIdModule<M, ID, RES>
         implements CrudModules.GetById<ID, RES> {
@@ -52,7 +52,7 @@ public abstract class AbstractGetByIdModule<M, ID, RES>
     /**
      * Executes the get-by-id use case.
      *
-     * @param id the unique identifier of the entity
+     * @param id the unique identifier of the model
      * @return an {@link Optional} containing the result representation if found,
      *         otherwise {@link Optional#empty()}
      */

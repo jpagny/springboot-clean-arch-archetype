@@ -56,10 +56,10 @@ public abstract class AbstractUpdateModule<M, ID, CMD, RES>
     /**
      * Executes the update use case.
      *
-     * @param id      the unique identifier of the entity to update
+     * @param id      the unique identifier of the model to update
      * @param command the command containing update data
-     * @return the result representation of the updated entity
-     * @throws RuntimeException if the entity cannot be found
+     * @return the result representation of the updated model
+     * @throws RuntimeException if the model cannot be found
      */
     @Override
     public RES handle(ID id, CMD command) {
@@ -96,14 +96,14 @@ public abstract class AbstractUpdateModule<M, ID, CMD, RES>
     protected abstract RES toResult(M saved);
 
     /**
-     * Creates the exception thrown when the entity to update cannot be found.
+     * Creates the exception thrown when the model to update cannot be found.
      *
      * <p>
      * Subclasses may override this method to provide a domain-specific
      * exception.
      * </p>
      *
-     * @param id the identifier of the entity that was not found
+     * @param id the identifier of the model that was not found
      * @return the exception to be thrown
      */
     protected RuntimeException notFound(ID id) {

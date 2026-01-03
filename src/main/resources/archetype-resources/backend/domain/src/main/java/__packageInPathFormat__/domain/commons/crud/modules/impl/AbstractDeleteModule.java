@@ -51,12 +51,12 @@ public abstract class AbstractDeleteModule<M, ID>
      * The execution flow is:
      * <ol>
      *   <li>Execute pre-deletion logic</li>
-     *   <li>Delete the entity by its identifier</li>
+     *   <li>Delete the model by its identifier</li>
      *   <li>Execute post-deletion logic</li>
      * </ol>
      * </p>
      *
-     * @param id the unique identifier of the entity to delete
+     * @param id the unique identifier of the model to delete
      */
     @Override
     public void handle(ID id) {
@@ -74,7 +74,7 @@ public abstract class AbstractDeleteModule<M, ID>
      * Default implementation does nothing.
      * </p>
      *
-     * @param id the unique identifier of the entity to delete
+     * @param id the unique identifier of the model to delete
      */
     protected void beforeDelete(ID id) {}
 
@@ -86,7 +86,7 @@ public abstract class AbstractDeleteModule<M, ID>
      * Default implementation does nothing.
      * </p>
      *
-     * @param id the unique identifier of the deleted entity
+     * @param id the unique identifier of the deleted model
      */
     protected void afterDelete(ID id) {}
 }
