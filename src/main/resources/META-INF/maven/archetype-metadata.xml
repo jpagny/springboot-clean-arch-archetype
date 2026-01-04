@@ -94,6 +94,14 @@
             </includes>
         </fileSet>
 
+        <!-- ===================== Dockerfile ===================== -->
+        <fileSet filtered="true" packaged="false">
+            <directory>backend</directory>
+            <includes>
+                <include>Dockerfile</include>
+            </includes>
+        </fileSet>
+
         <!-- ===================== DOCS ===================== -->
         <fileSet>
             <directory>docs</directory>
@@ -113,14 +121,13 @@
         </fileSet>
 
         <!-- ===================== GENERATED PROJECT ROOT ===================== -->
-        <fileSet filtered="true">
-            <directory>.</directory>
+        <fileSet filtered="false" packaged="false">
+            <directory>project-root</directory>
             <includes>
-                <include>pom.xml</include>
-                <include>README.md</include>
-                <include>.gitignore</include>
+                <include>**/*</include>
             </includes>
         </fileSet>
+
 
     </fileSets>
 </archetype-descriptor>
