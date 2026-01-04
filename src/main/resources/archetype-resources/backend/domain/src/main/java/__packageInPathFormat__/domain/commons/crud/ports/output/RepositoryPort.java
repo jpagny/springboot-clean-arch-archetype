@@ -21,9 +21,9 @@ import java.util.Optional;
  * </p>
  *
  * @param <M>  the domain model or aggregate root type
- * @param <ID> the identifier type of the model
+ * @param <I> the identifier type of the model
  */
-public interface RepositoryPort<M, ID> {
+public interface RepositoryPort<M, I> {
 
     /**
      * Persists the given model.
@@ -45,7 +45,7 @@ public interface RepositoryPort<M, ID> {
      * @return an {@link Optional} containing the model if found,
      *         otherwise {@link Optional#empty()}
      */
-    Optional<M> findById(ID id);
+    Optional<M> findById(I id);
 
     /**
      * Checks whether a model with the given identifier exists.
@@ -53,7 +53,7 @@ public interface RepositoryPort<M, ID> {
      * @param id the unique identifier of the model
      * @return {@code true} if the model exists, {@code false} otherwise
      */
-    boolean existsById(ID id);
+    boolean existsById(I id);
 
     /**
      * Retrieves all models using pagination.
@@ -68,5 +68,5 @@ public interface RepositoryPort<M, ID> {
      *
      * @param id the unique identifier of the model to delete
      */
-    void deleteById(ID id);
+    void deleteById(I id);
 }

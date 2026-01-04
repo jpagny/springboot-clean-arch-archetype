@@ -28,12 +28,12 @@ public class BaseBusinessException extends RuntimeException implements IBaseExce
     /**
      * Business error definition associated with this exception.
      */
-    private final IBusinessError businessError;
+    private final transient IBusinessError businessError;
 
     /**
      * Optional arguments used to parameterize error messages.
      */
-    private final Object[] args;
+    private final transient Object[] args;
 
     /**
      * Creates a new business exception for the given business error.

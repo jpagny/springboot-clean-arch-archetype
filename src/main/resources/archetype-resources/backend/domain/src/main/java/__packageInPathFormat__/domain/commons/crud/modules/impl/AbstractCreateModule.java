@@ -30,17 +30,17 @@ import java.util.Objects;
  * </p>
  *
  * @param <M>   the domain model or aggregate root type
- * @param <ID>  the identifier type of the model
- * @param <CMD> the command type containing creation data
- * @param <RES> the result type returned after creation
+ * @param <I>  the identifier type of the model
+ * @param <C> the command type containing creation data
+ * @param <R> the result type returned after creation
  */
-public abstract class AbstractCreateModule<M, ID, CMD, RES>
-        implements CrudModules.Create<CMD, RES> {
+public abstract class AbstractCreateModule<M, I, C, R>
+        implements CrudModules.Create<C, R> {
 
     /**
      * Repository port used to persist the domain model.
      */
-    private final RepositoryPort<M, ID> repository;
+    private final RepositoryPort<M, I> repository;
 
     /**
      * Creates a new create module with the given repository port.
@@ -48,7 +48,7 @@ public abstract class AbstractCreateModule<M, ID, CMD, RES>
      * @param repository the repository port used for persistence
      * @throws NullPointerException if the repository is {@code null}
      */
-    protected AbstractCreateModule(RepositoryPort<M, ID> repository) {
+    protected AbstractCreateModule(RepositoryPort<M, I> repository) {
         this.repository = Objects.requireNonNull(repository);
     }
 
@@ -70,7 +70,7 @@ public abstract class AbstractCreateModule<M, ID, CMD, RES>
      * @return the result representation of the created model
      */
     @Override
-    public RES handle(CMD command) {
+    public R handle(C command) {
         var model = toModel(command);
         validateForCreate(model, command);
         var saved = repository.save(model);
@@ -84,7 +84,7 @@ public abstract class AbstractCreateModule<M, ID, CMD, RES>
      * @param command the creation command
      * @return the domain model to be persisted
      */
-    protected abstract M toModel(CMD command);
+    protected abstract M toModel(C command);
 
     /**
      * Converts the persisted domain model into a result object.
@@ -92,7 +92,7 @@ public abstract class AbstractCreateModule<M, ID, CMD, RES>
      * @param saved the persisted domain model
      * @return the result representation
      */
-    protected abstract RES toResult(M saved);
+    protected abstract R toResult(M saved);
 
     /**
      * Hook method used to validate the model before creation.
@@ -105,7 +105,7 @@ public abstract class AbstractCreateModule<M, ID, CMD, RES>
      * @param model   the domain model to validate
      * @param command the original creation command
      */
-    protected void validateForCreate(M model, CMD command) {}
+    protected void validateForCreate(M model, C command) {}
 
     /**
      * Hook method executed after the model has been successfully created.
@@ -119,5 +119,5 @@ public abstract class AbstractCreateModule<M, ID, CMD, RES>
      * @param saved   the persisted domain model
      * @param command the original creation command
      */
-    protected void onCreated(M saved, CMD command) {}
+    protected void onCreated(M saved, C command) {}
 }

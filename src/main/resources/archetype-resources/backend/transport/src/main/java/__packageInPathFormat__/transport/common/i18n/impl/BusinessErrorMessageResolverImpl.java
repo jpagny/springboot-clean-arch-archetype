@@ -4,6 +4,7 @@ import ${package}.domain.commons.exceptions.engine.ErrorContext;
 import ${package}.domain.commons.exceptions.engine.IBusinessError;
 import ${package}.transport.common.i18n.BusinessErrorMessageResolver;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +21,6 @@ public class BusinessErrorMessageResolverImpl implements BusinessErrorMessageRes
 
     private final MessageSourceAccessor accessor;
 
-    @SuppressWarnings("DataFlowIssue")
     @Override
     public String resolve(IBusinessError error, Locale locale, Object... args) {
         if (error == null || error.code() == null) {
@@ -31,11 +31,11 @@ public class BusinessErrorMessageResolverImpl implements BusinessErrorMessageRes
         final var context   = resolveContext(error);
 
         final var ctxKey = String.join(KEY_SEPARATOR, ERROR_KEY_PREFIX, context, codeLower);
-        final var ctxMsg = accessor.getMessage(ctxKey, args, null, locale);
+        final var ctxMsg = tryResolve(ctxKey, locale, args);
         if (ctxMsg != null) return ctxMsg;
 
         final var globalKey = String.join(KEY_SEPARATOR, ERROR_KEY_PREFIX, codeLower);
-        final var globalMsg = accessor.getMessage(globalKey, args, null, locale);
+        final var globalMsg = tryResolve(globalKey, locale, args);
         if (globalMsg != null) return globalMsg;
 
         return error.code().name();
@@ -47,4 +47,13 @@ public class BusinessErrorMessageResolverImpl implements BusinessErrorMessageRes
                 ? ann.value().toLowerCase(Locale.ROOT)
                 : DEFAULT_CONTEXT;
     }
+
+    private String tryResolve(String key, Locale locale, Object... args) {
+        try {
+            return accessor.getMessage(key, args, locale);
+        } catch (NoSuchMessageException e) {
+            return null;
+        }
+    }
+
 }

@@ -49,12 +49,6 @@ public class DefaultErrorCodeToHttpStatusResolverImpl
     }
 
     /**
-     * Default constructor.
-     */
-    public DefaultErrorCodeToHttpStatusResolverImpl() {
-    }
-
-    /**
      * Resolves the HTTP status corresponding to the given domain error code.
      *
      * @param code the domain error code

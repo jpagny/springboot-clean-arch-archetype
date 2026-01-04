@@ -1,6 +1,6 @@
 package ${package}.external.common.persistence.mappings;
 
-import com.mycompany.external.common.persistence.mapping.IdMapper;
+import ${package}.external.common.persistence.mappers.IdMapper;
 import org.springframework.stereotype.Component;
 
 /**

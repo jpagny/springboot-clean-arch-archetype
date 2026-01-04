@@ -20,10 +20,10 @@ public interface CrudModules {
     /**
      * Contract for creating a domain model or aggregate.
      *
-     * @param <CMD> the command object containing creation data
-     * @param <RES> the result type returned after creation
+     * @param <C> the command object containing creation data
+     * @param <R> the result type returned after creation
      */
-    interface Create<CMD, RES> {
+    interface Create<C, R> {
 
         /**
          * Handles the creation use case.
@@ -31,17 +31,17 @@ public interface CrudModules {
          * @param command the command containing the data required to create the model
          * @return the created model representation
          */
-        RES handle(CMD command);
+        R handle(C command);
     }
 
     /**
      * Contract for updating an existing domain model or aggregate.
      *
-     * @param <ID>  the identifier type of the model
-     * @param <CMD> the command object containing update data
-     * @param <RES> the result type returned after update
+     * @param <I>  the identifier type of the model
+     * @param <C> the command object containing update data
+     * @param <R> the result type returned after update
      */
-    interface Update<ID, CMD, RES> {
+    interface Update<I, C, R> {
 
         /**
          * Handles the update use case.
@@ -50,16 +50,16 @@ public interface CrudModules {
          * @param command the command containing updated data
          * @return the updated model representation
          */
-        RES handle(ID id, CMD command);
+        R handle(I id, C command);
     }
 
     /**
      * Contract for retrieving a domain model by its identifier.
      *
-     * @param <ID>  the identifier type of the model
-     * @param <RES> the result type returned if the model exists
+     * @param <I>  the identifier type of the model
+     * @param <R> the result type returned if the model exists
      */
-    interface GetById<ID, RES> {
+    interface GetById<I, R> {
 
         /**
          * Handles the retrieval use case.
@@ -67,15 +67,15 @@ public interface CrudModules {
          * @param id the unique identifier of the model
          * @return an {@link Optional} containing the model if found, otherwise empty
          */
-        Optional<RES> handle(ID id);
+        Optional<R> handle(I id);
     }
 
     /**
      * Contract for listing domain entities using pagination.
      *
-     * @param <RES> the type of elements returned in the page
+     * @param <R> the type of elements returned in the page
      */
-    interface List<RES> {
+    interface List<R> {
 
         /**
          * Handles the listing use case.
@@ -83,21 +83,21 @@ public interface CrudModules {
          * @param pageRequest pagination and sorting information
          * @return a {@link Page} containing the requested entities
          */
-        Page<RES> handle(PageRequest pageRequest);
+        Page<R> handle(PageRequest pageRequest);
     }
 
     /**
      * Contract for deleting a domain model by its identifier.
      *
-     * @param <ID> the identifier type of the model
+     * @param <I> the identifier type of the model
      */
-    interface Delete<ID> {
+    interface Delete<I> {
 
         /**
          * Handles the deletion use case.
          *
          * @param id the unique identifier of the model to delete
          */
-        void handle(ID id);
+        void handle(I id);
     }
 }

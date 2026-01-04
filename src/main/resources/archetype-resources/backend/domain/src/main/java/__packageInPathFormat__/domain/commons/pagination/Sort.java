@@ -1,8 +1,6 @@
 package ${package}.domain.commons.pagination;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,7 +12,7 @@ import java.util.Objects;
  * independent of any persistence or framework-specific implementation.
  * </p>
  */
-public final class Sort implements Serializable {
+public record Sort(List<Order> orders) implements Serializable {
 
     /**
      * Sorting direction.
@@ -31,45 +29,19 @@ public final class Sort implements Serializable {
      * Each order defines a property and a direction.
      * </p>
      */
-    public static final class Order implements Serializable {
+    public record Order(Direction direction, String property) implements Serializable {
 
-        private final Direction direction;
-        private final String property;
-
-        /**
-         * Creates a new sort order.
-         *
-         * @param direction the sort direction
-         * @param property the property name to sort by
-         */
-        public Order(Direction direction, String property) {
-            this.direction = Objects.requireNonNull(direction, "direction");
-            this.property = Objects.requireNonNull(property, "property");
-        }
-
-        /**
-         * Returns the sort direction.
-         *
-         * @return the {@link Direction}
-         */
-        public Direction direction() {
-            return direction;
-        }
-
-        /**
-         * Returns the property name to sort by.
-         *
-         * @return the property name
-         */
-        public String property() {
-            return property;
+        public Order {
+            Objects.requireNonNull(direction, "direction");
+            Objects.requireNonNull(property, "property");
         }
     }
 
-    private final List<Order> orders;
-
-    private Sort(List<Order> orders) {
-        this.orders = Collections.unmodifiableList(new ArrayList<>(orders));
+    /**
+     * Canonical constructor with defensive copy.
+     */
+    public Sort {
+        orders = List.copyOf(Objects.requireNonNull(orders, "orders"));
     }
 
     /**
@@ -89,15 +61,6 @@ public final class Sort implements Serializable {
      */
     public static Sort unsorted() {
         return new Sort(List.of());
-    }
-
-    /**
-     * Returns the list of sort orders.
-     *
-     * @return an unmodifiable list of {@link Order}
-     */
-    public List<Order> orders() {
-        return orders;
     }
 
     /**

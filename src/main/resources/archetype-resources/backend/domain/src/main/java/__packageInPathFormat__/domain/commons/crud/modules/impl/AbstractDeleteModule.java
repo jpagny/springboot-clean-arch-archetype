@@ -26,13 +26,13 @@ import java.util.Objects;
  * @param <M>  the domain model or aggregate root type
  * @param <ID> the identifier type of the model
  */
-public abstract class AbstractDeleteModule<M, ID>
-        implements CrudModules.Delete<ID> {
+public abstract class AbstractDeleteModule<M, I>
+        implements CrudModules.Delete<I> {
 
     /**
      * Repository port used to delete the domain model.
      */
-    private final RepositoryPort<M, ID> repository;
+    private final RepositoryPort<M, I> repository;
 
     /**
      * Creates a new delete module with the given repository port.
@@ -40,7 +40,7 @@ public abstract class AbstractDeleteModule<M, ID>
      * @param repository the repository port used to perform deletion
      * @throws NullPointerException if the repository is {@code null}
      */
-    protected AbstractDeleteModule(RepositoryPort<M, ID> repository) {
+    protected AbstractDeleteModule(RepositoryPort<M, I> repository) {
         this.repository = Objects.requireNonNull(repository);
     }
 
@@ -59,7 +59,7 @@ public abstract class AbstractDeleteModule<M, ID>
      * @param id the unique identifier of the model to delete
      */
     @Override
-    public void handle(ID id) {
+    public void handle(I id) {
         beforeDelete(id);
         repository.deleteById(id);
         afterDelete(id);
@@ -76,7 +76,7 @@ public abstract class AbstractDeleteModule<M, ID>
      *
      * @param id the unique identifier of the model to delete
      */
-    protected void beforeDelete(ID id) {}
+    protected void beforeDelete(I id) {}
 
     /**
      * Hook method executed after the deletion has occurred.
@@ -88,5 +88,5 @@ public abstract class AbstractDeleteModule<M, ID>
      *
      * @param id the unique identifier of the deleted model
      */
-    protected void afterDelete(ID id) {}
+    protected void afterDelete(I id) {}
 }

@@ -5,7 +5,6 @@ import ${package}.external.common.qualifier.ExternalConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration.AccessLevel;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -70,13 +69,10 @@ public class ModelMapperConfiguration {
      * @return the presentation {@link ModelMapper}
      */
     @Bean
-    @Qualifier("presentationMapper")
     public ModelMapper presentationMapper(
             @PresentationConverter List<Converter<?, ?>> converters
     ) {
-        var modelMapper = base();
-        converters.forEach(modelMapper::addConverter);
-        return modelMapper;
+        return mapperWith(converters);
     }
 
     /**
@@ -91,12 +87,16 @@ public class ModelMapperConfiguration {
      * @return the external {@link ModelMapper}
      */
     @Bean
-    @Qualifier("externalMapper")
     public ModelMapper externalMapper(
             @ExternalConverter List<Converter<?, ?>> converters
     ) {
+        return mapperWith(converters);
+    }
+
+    private ModelMapper mapperWith(List<Converter<?, ?>> converters) {
         var modelMapper = base();
         converters.forEach(modelMapper::addConverter);
         return modelMapper;
     }
+
 }

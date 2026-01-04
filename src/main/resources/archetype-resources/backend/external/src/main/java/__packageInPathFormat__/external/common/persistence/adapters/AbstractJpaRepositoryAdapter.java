@@ -3,8 +3,8 @@ package ${package}.external.common.persistence.adapters;
 import ${package}.domain.commons.crud.ports.output.RepositoryPort;
 import ${package}.domain.commons.pagination.Page;
 import ${package}.domain.commons.pagination.PageRequest;
-import ${package}.external.common.persistence.mapping.IdMapper;
-import ${package}.external.common.persistence.mapping.PersistenceMapper;
+import ${package}.external.common.persistence.mappers.IdMapper;
+import ${package}.external.common.persistence.mappers.PersistenceMapper;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Objects;
@@ -36,17 +36,17 @@ import java.util.Optional;
  * </p>
  *
  * @param <M>    the domain model or aggregate root type
- * @param <ID>   the domain identifier type
+ * @param <I>   the domain identifier type
  * @param <E>    the persistence entity type
- * @param <DBID> the database identifier type
+ * @param <K> the database identifier type
  */
-public abstract class AbstractJpaRepositoryAdapter<M, ID, E, DBID>
-        implements RepositoryPort<M, ID> {
+public abstract class AbstractJpaRepositoryAdapter<M, I, E, K>
+        implements RepositoryPort<M, I> {
 
     /**
      * Spring Data JPA repository.
      */
-    private final JpaRepository<E, DBID> jpa;
+    private final JpaRepository<E, K> jpa;
 
     /**
      * Mapper converting between domain models and persistence entities.
@@ -56,7 +56,7 @@ public abstract class AbstractJpaRepositoryAdapter<M, ID, E, DBID>
     /**
      * Mapper converting between domain identifiers and database identifiers.
      */
-    private final IdMapper<ID, DBID> idMapper;
+    private final IdMapper<I, K> idMapper;
 
     /**
      * Mapper converting domain sorting to Spring Data sorting.
@@ -72,9 +72,9 @@ public abstract class AbstractJpaRepositoryAdapter<M, ID, E, DBID>
      * @param sortMapper the domain-to-Spring sort mapper
      */
     protected AbstractJpaRepositoryAdapter(
-            JpaRepository<E, DBID> jpa,
+            JpaRepository<E, K> jpa,
             PersistenceMapper<M, E> mapper,
-            IdMapper<ID, DBID> idMapper,
+            IdMapper<I, K> idMapper,
             SpringSortMapper sortMapper
     ) {
         this.jpa = Objects.requireNonNull(jpa, "jpa");
@@ -102,7 +102,7 @@ public abstract class AbstractJpaRepositoryAdapter<M, ID, E, DBID>
      * @return an {@link Optional} containing the model if found
      */
     @Override
-    public Optional<M> findById(ID id) {
+    public Optional<M> findById(I id) {
         return jpa.findById(idMapper.toDbId(id))
                 .map(mapper::toModel);
     }
@@ -114,7 +114,7 @@ public abstract class AbstractJpaRepositoryAdapter<M, ID, E, DBID>
      * @return {@code true} if the model exists, {@code false} otherwise
      */
     @Override
-    public boolean existsById(ID id) {
+    public boolean existsById(I id) {
         return jpa.existsById(idMapper.toDbId(id));
     }
 
@@ -154,7 +154,7 @@ public abstract class AbstractJpaRepositoryAdapter<M, ID, E, DBID>
      * @param id the domain identifier
      */
     @Override
-    public void deleteById(ID id) {
+    public void deleteById(I id) {
         jpa.deleteById(idMapper.toDbId(id));
     }
 }

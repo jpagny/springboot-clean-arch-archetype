@@ -31,17 +31,17 @@ import java.util.Objects;
  * </p>
  *
  * @param <M>   the domain model or aggregate root type
- * @param <ID>  the identifier type of the model
- * @param <CMD> the command type containing update data
- * @param <RES> the result type returned after update
+ * @param <I>  the identifier type of the model
+ * @param <C> the command type containing update data
+ * @param <R> the result type returned after update
  */
-public abstract class AbstractUpdateModule<M, ID, CMD, RES>
-        implements CrudModules.Update<ID, CMD, RES> {
+public abstract class AbstractUpdateModule<M, I, C, R>
+        implements CrudModules.Update<I, C, R> {
 
     /**
      * Repository port used to retrieve and persist the domain model.
      */
-    private final RepositoryPort<M, ID> repository;
+    private final RepositoryPort<M, I> repository;
 
     /**
      * Creates a new update module with the given repository port.
@@ -49,7 +49,7 @@ public abstract class AbstractUpdateModule<M, ID, CMD, RES>
      * @param repository the repository port used for retrieval and persistence
      * @throws NullPointerException if the repository is {@code null}
      */
-    protected AbstractUpdateModule(RepositoryPort<M, ID> repository) {
+    protected AbstractUpdateModule(RepositoryPort<M, I> repository) {
         this.repository = Objects.requireNonNull(repository);
     }
 
@@ -62,7 +62,7 @@ public abstract class AbstractUpdateModule<M, ID, CMD, RES>
      * @throws RuntimeException if the model cannot be found
      */
     @Override
-    public RES handle(ID id, CMD command) {
+    public R handle(I id, C command) {
         var model = repository.findById(id)
                 .orElseThrow(() -> notFound(id));
 
@@ -85,7 +85,7 @@ public abstract class AbstractUpdateModule<M, ID, CMD, RES>
      * @param command  the update command
      * @return the merged domain model
      */
-    protected abstract M merge(M existing, CMD command);
+    protected abstract M merge(M existing, C command);
 
     /**
      * Converts the persisted domain model into a result representation.
@@ -93,7 +93,7 @@ public abstract class AbstractUpdateModule<M, ID, CMD, RES>
      * @param saved the persisted domain model
      * @return the result representation
      */
-    protected abstract RES toResult(M saved);
+    protected abstract R toResult(M saved);
 
     /**
      * Creates the exception thrown when the model to update cannot be found.
@@ -106,7 +106,7 @@ public abstract class AbstractUpdateModule<M, ID, CMD, RES>
      * @param id the identifier of the model that was not found
      * @return the exception to be thrown
      */
-    protected RuntimeException notFound(ID id) {
+    protected RuntimeException notFound(I id) {
         return new IllegalArgumentException("Not found: " + id);
     }
 
@@ -121,7 +121,7 @@ public abstract class AbstractUpdateModule<M, ID, CMD, RES>
      * @param model   the updated domain model
      * @param command the original update command
      */
-    protected void validateForUpdate(M model, CMD command) {}
+    protected void validateForUpdate(M model, C command) {}
 
     /**
      * Hook method executed after the model has been successfully updated.
@@ -135,5 +135,5 @@ public abstract class AbstractUpdateModule<M, ID, CMD, RES>
      * @param saved   the persisted domain model
      * @param command the original update command
      */
-    protected void onUpdated(M saved, CMD command) {}
+    protected void onUpdated(M saved, C command) {}
 }

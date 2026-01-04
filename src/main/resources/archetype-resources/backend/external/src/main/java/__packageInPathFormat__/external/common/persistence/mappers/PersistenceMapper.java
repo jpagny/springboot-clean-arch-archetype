@@ -1,4 +1,4 @@
-package ${package}.external.common.persistence.mapping;
+package ${package}.external.common.persistence.mappers;
 
 /**
  * Contract for mapping between domain models and persistence entities.

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # --- Defaults (override via CLI args or env) ---
-ARCHETYPE_GROUP_DEFAULT="com.mycompany"
+ARCHETYPE_GROUP_DEFAULT="com.jpagny"
 ARCHETYPE_ARTIFACT_DEFAULT="springboot-clean-arch-archetype"
 ARCHETYPE_VERSION_DEFAULT="1.0.0-SNAPSHOT"
 

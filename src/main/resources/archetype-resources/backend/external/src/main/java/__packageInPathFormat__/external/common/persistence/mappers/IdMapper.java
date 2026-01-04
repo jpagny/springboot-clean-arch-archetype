@@ -1,4 +1,4 @@
-package ${package}.external.common.persistence.mapping;
+package ${package}.external.common.persistence.mappers;
 
 /**
  * Contract for mapping domain identifiers to database identifiers.
@@ -13,10 +13,10 @@ package ${package}.external.common.persistence.mapping;
  * layer to remain independent from database identifier representations.
  * </p>
  *
- * @param <ID>   the domain identifier type
- * @param <DBID> the database identifier type
+ * @param <I>   the domain identifier type
+ * @param <K> the database identifier type
  */
-public interface IdMapper<ID, DBID> {
+public interface IdMapper<I, K> {
 
     /**
      * Converts a domain identifier into a database identifier.
@@ -24,7 +24,7 @@ public interface IdMapper<ID, DBID> {
      * @param id the domain identifier
      * @return the database identifier
      */
-    DBID toDbId(ID id);
+    K toDbId(I id);
 
     /**
      * Converts a database identifier into a domain identifier.
@@ -38,7 +38,7 @@ public interface IdMapper<ID, DBID> {
      * @return the domain identifier
      * @throws UnsupportedOperationException if not implemented
      */
-    default ID toDomainId(DBID dbId) {
+    default I toDomainId(K dbId) {
         throw new UnsupportedOperationException("toDomainId not implemented");
     }
 }

@@ -30,16 +30,16 @@ import java.util.Objects;
  * </p>
  *
  * @param <M>   the domain model or aggregate root type
- * @param <ID>  the identifier type of the model
- * @param <RES> the result type returned in the page content
+ * @param <I>  the identifier type of the model
+ * @param <R> the result type returned in the page content
  */
-public abstract class AbstractListModule<M, ID, RES>
-        implements CrudModules.List<RES> {
+public abstract class AbstractListModule<M, I, R>
+        implements CrudModules.List<R> {
 
     /**
      * Repository port used to retrieve paginated domain models.
      */
-    private final RepositoryPort<M, ID> repository;
+    private final RepositoryPort<M, I> repository;
 
     /**
      * Creates a new list module with the given repository port.
@@ -47,7 +47,7 @@ public abstract class AbstractListModule<M, ID, RES>
      * @param repository the repository port used for retrieval
      * @throws NullPointerException if the repository is {@code null}
      */
-    protected AbstractListModule(RepositoryPort<M, ID> repository) {
+    protected AbstractListModule(RepositoryPort<M, I> repository) {
         this.repository = Objects.requireNonNull(repository);
     }
 
@@ -58,7 +58,7 @@ public abstract class AbstractListModule<M, ID, RES>
      * @return a {@link Page} containing the result representations
      */
     @Override
-    public Page<RES> handle(PageRequest pageRequest) {
+    public Page<R> handle(PageRequest pageRequest) {
         Page<M> page = repository.findAll(pageRequest);
 
         var content = page.content().stream()
@@ -81,5 +81,5 @@ public abstract class AbstractListModule<M, ID, RES>
      * @param model the domain model
      * @return the result representation
      */
-    protected abstract RES toResult(M model);
+    protected abstract R toResult(M model);
 }

@@ -28,16 +28,16 @@ import java.util.Optional;
  * </p>
  *
  * @param <M>   the domain model or aggregate root type
- * @param <ID>  the identifier type of the model
- * @param <RES> the result type returned when the model is found
+ * @param <I>  the identifier type of the model
+ * @param <R> the result type returned when the model is found
  */
-public abstract class AbstractGetByIdModule<M, ID, RES>
-        implements CrudModules.GetById<ID, RES> {
+public abstract class AbstractGetByIdModule<M, I, R>
+        implements CrudModules.GetById<I, R> {
 
     /**
      * Repository port used to retrieve the domain model.
      */
-    private final RepositoryPort<M, ID> repository;
+    private final RepositoryPort<M, I> repository;
 
     /**
      * Creates a new get-by-id module with the given repository port.
@@ -45,7 +45,7 @@ public abstract class AbstractGetByIdModule<M, ID, RES>
      * @param repository the repository port used to retrieve entities
      * @throws NullPointerException if the repository is {@code null}
      */
-    protected AbstractGetByIdModule(RepositoryPort<M, ID> repository) {
+    protected AbstractGetByIdModule(RepositoryPort<M, I> repository) {
         this.repository = Objects.requireNonNull(repository);
     }
 
@@ -57,7 +57,7 @@ public abstract class AbstractGetByIdModule<M, ID, RES>
      *         otherwise {@link Optional#empty()}
      */
     @Override
-    public Optional<RES> handle(ID id) {
+    public Optional<R> handle(I id) {
         return repository.findById(id).map(this::toResult);
     }
 
@@ -67,5 +67,5 @@ public abstract class AbstractGetByIdModule<M, ID, RES>
      * @param model the retrieved domain model
      * @return the result representation
      */
-    protected abstract RES toResult(M model);
+    protected abstract R toResult(M model);
 }

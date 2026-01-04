@@ -1,4 +1,4 @@
-package ${package}.api.rest.endpoints.example.controller;
+package ${package}.api.rest.endpoints;
 
 import ${package}.transport.endpoints.example.create.ExampleCreateEndpointHandler;
 import ${package}.transport.endpoints.example.create.input.CreateExampleRequest;
