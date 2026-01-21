@@ -1,9 +1,9 @@
-package com.mycompany.api.rest.advice;
+package ${package}.api.rest.advice;
 
-import com.mycompany.domain.commons.exceptions.engine.BaseBusinessException;
-import com.mycompany.transport.common.errors.DefaultErrorResponse;
-import com.mycompany.transport.common.errors.http.ErrorCodeToHttpStatusResolver;
-import com.mycompany.transport.common.i18n.BusinessErrorMessageResolver;
+import ${package}.domain.commons.exceptions.engine.BaseBusinessException;
+import ${package}.transport.common.errors.DefaultErrorResponse;
+import ${package}.transport.common.errors.http.ErrorCodeToHttpStatusResolver;
+import ${package}.transport.common.i18n.BusinessErrorMessageResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
