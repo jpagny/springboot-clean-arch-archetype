@@ -1,35 +1,30 @@
 package ${package}.transport.endpoints.example.create.output;
 
-import ${package}.transport.common.qualifier.PresentationConverter;
 import ${package}.domain.core.example.messages.ExampleMessageKey;
-import ${package}.transport.endpoints.example.create.resolver.ExampleMessageResolver;
 import ${package}.domain.core.example.operations.results.CreateExampleResult;
-import org.modelmapper.Converter;
-import org.modelmapper.spi.MappingContext;
+import ${package}.transport.common.contracts.OutputPresenter;
+import ${package}.transport.endpoints.example.create.resolver.ExampleMessageResolver;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
-@PresentationConverter
 public class CreateExampleResultToResponseConverter
-        implements Converter<CreateExampleResult, CreateExampleResponse> {
+        implements OutputPresenter<CreateExampleResult, CreateExampleResponse> {
 
     private final ExampleMessageResolver messageResolver;
 
     public CreateExampleResultToResponseConverter(ExampleMessageResolver messageResolver) {
-        this.messageResolver = messageResolver;
+        this.messageResolver = Objects.requireNonNull(messageResolver, "messageResolver");
     }
 
     @Override
-    public CreateExampleResponse convert(
-            MappingContext<CreateExampleResult, CreateExampleResponse> ctx) {
-
-        CreateExampleResult src = ctx.getSource();
-
+    public CreateExampleResponse toResponse(CreateExampleResult result) {
         String message = messageResolver.resolve(
                 ExampleMessageKey.EXAMPLE_CREATED,
-                src.name()
+                result.name()
         );
 
-        return new CreateExampleResponse(String.valueOf(src.id()), message);
+        return new CreateExampleResponse(String.valueOf(result.id()), message);
     }
 }
