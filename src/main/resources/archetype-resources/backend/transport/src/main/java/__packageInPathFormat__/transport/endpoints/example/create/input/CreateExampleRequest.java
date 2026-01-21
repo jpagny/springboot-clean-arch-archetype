@@ -1,5 +1,6 @@
 package ${package}.transport.endpoints.example.create.input;
 
+import ${package}.domain.core.example.operations.commands.CreateExampleCommand;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -9,4 +10,7 @@ public record CreateExampleRequest(
         String name
 ) {
 
+        public CreateExampleCommand toCommand() {
+                return new CreateExampleCommand(name);
+        }
 }

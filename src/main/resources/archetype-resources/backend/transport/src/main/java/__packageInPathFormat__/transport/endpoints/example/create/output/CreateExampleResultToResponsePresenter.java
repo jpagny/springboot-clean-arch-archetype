@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 @Component
-public class CreateExampleResultToResponseConverter
+public class CreateExampleResultToResponsePresenter
         implements OutputPresenter<CreateExampleResult, CreateExampleResponse> {
 
     private final ExampleMessageResolver messageResolver;
 
-    public CreateExampleResultToResponseConverter(ExampleMessageResolver messageResolver) {
+    public CreateExampleResultToResponsePresenter(ExampleMessageResolver messageResolver) {
         this.messageResolver = Objects.requireNonNull(messageResolver, "messageResolver");
     }
 
