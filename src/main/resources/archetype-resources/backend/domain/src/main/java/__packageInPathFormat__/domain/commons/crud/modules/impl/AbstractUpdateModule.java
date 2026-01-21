@@ -1,7 +1,8 @@
 package ${package}.domain.commons.crud.modules.impl;
 
 import ${package}.domain.commons.crud.modules.CrudModules;
-import ${package}.domain.commons.crud.ports.output.RepositoryPort;
+import ${package}.domain.commons.crud.ports.output.CommandRepositoryPort;
+import ${package}.domain.commons.crud.ports.output.QueryRepositoryPort;
 
 import java.util.Objects;
 
@@ -10,16 +11,16 @@ import java.util.Objects;
  *
  * <p>
  * This class implements the {@link CrudModules.Update} contract and provides
- * a reusable template for updating an existing domain model or aggregate.
+ * a reusable template for updating an existing domain model or aggregate root.
  * </p>
  *
  * <p>
  * It follows the Template Method pattern and defines a standard update flow:
  * <ul>
- *   <li>Retrieve the existing model by its identifier</li>
+ *   <li>Retrieve the existing model by its identifier using a query repository port</li>
  *   <li>Merge the update command into the existing model</li>
  *   <li>Validate the updated model</li>
- *   <li>Persist the updated model</li>
+ *   <li>Persist the updated model using a command repository port</li>
  *   <li>Execute post-update logic</li>
  *   <li>Map the persisted model to a result representation</li>
  * </ul>
@@ -30,8 +31,8 @@ import java.util.Objects;
  * infrastructure or framework-specific components.
  * </p>
  *
- * @param <M>   the domain model or aggregate root type
- * @param <I>  the identifier type of the model
+ * @param <M> the domain model or aggregate root type
+ * @param <I> the identifier type of the model
  * @param <C> the command type containing update data
  * @param <R> the result type returned after update
  */
@@ -39,22 +40,37 @@ public abstract class AbstractUpdateModule<M, I, C, R>
         implements CrudModules.Update<I, C, R> {
 
     /**
-     * Repository port used to retrieve and persist the domain model.
+     * Query repository port used to retrieve the existing domain model.
      */
-    private final RepositoryPort<M, I> repository;
+    private final QueryRepositoryPort<M, I> queryRepository;
 
     /**
-     * Creates a new update module with the given repository port.
-     *
-     * @param repository the repository port used for retrieval and persistence
-     * @throws NullPointerException if the repository is {@code null}
+     * Command repository port used to persist the updated domain model.
      */
-    protected AbstractUpdateModule(RepositoryPort<M, I> repository) {
-        this.repository = Objects.requireNonNull(repository);
+    private final CommandRepositoryPort<M, I> commandRepository;
+
+    /**
+     * Creates a new update module with the given repository ports.
+     *
+     * @param queryRepository   the query repository port used for retrieval
+     * @param commandRepository the command repository port used for persistence
+     * @throws NullPointerException if any repository is {@code null}
+     */
+    protected AbstractUpdateModule(
+            QueryRepositoryPort<M, I> queryRepository,
+            CommandRepositoryPort<M, I> commandRepository
+    ) {
+        this.queryRepository = Objects.requireNonNull(queryRepository, "queryRepository");
+        this.commandRepository = Objects.requireNonNull(commandRepository, "commandRepository");
     }
 
     /**
      * Executes the update use case.
+     *
+     * <p>
+     * This operation modifies the system state and should be executed within
+     * an appropriate transactional boundary.
+     * </p>
      *
      * @param id      the unique identifier of the model to update
      * @param command the command containing update data
@@ -63,12 +79,14 @@ public abstract class AbstractUpdateModule<M, I, C, R>
      */
     @Override
     public R handle(I id, C command) {
-        var model = repository.findById(id)
+        var existing = queryRepository.findById(id)
                 .orElseThrow(() -> notFound(id));
 
-        var merged = merge(model, command);
+        var merged = merge(existing, command);
         validateForUpdate(merged, command);
-        var saved = repository.save(merged);
+
+        var saved = commandRepository.save(merged);
+
         onUpdated(saved, command);
         return toResult(saved);
     }

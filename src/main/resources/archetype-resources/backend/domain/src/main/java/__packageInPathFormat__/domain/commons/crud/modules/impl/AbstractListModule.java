@@ -1,7 +1,7 @@
 package ${package}.domain.commons.crud.modules.impl;
 
 import ${package}.domain.commons.crud.modules.CrudModules;
-import ${package}.domain.commons.crud.ports.output.RepositoryPort;
+import ${package}.domain.commons.crud.ports.output.QueryRepositoryPort;
 import ${package}.domain.commons.pagination.Page;
 import ${package}.domain.commons.pagination.PageRequest;
 
@@ -12,15 +12,16 @@ import java.util.Objects;
  *
  * <p>
  * This class implements the {@link CrudModules.List} contract and provides
- * a reusable template for listing domain models using pagination.
+ * a reusable template for listing domain models or aggregate roots using
+ * pagination and sorting.
  * </p>
  *
  * <p>
- * The responsibilities of this module are:
+ * This module represents a read-only use case and follows a standard query flow:
  * <ul>
- *   <li>Retrieving paginated domain models through a repository port</li>
- *   <li>Mapping domain models to result representations</li>
- *   <li>Returning a paginated result consistent with domain pagination rules</li>
+ *   <li>Retrieve paginated domain models using a query repository port</li>
+ *   <li>Map each domain model to a result representation</li>
+ *   <li>Return a paginated result consistent with domain pagination rules</li>
  * </ul>
  * </p>
  *
@@ -29,30 +30,34 @@ import java.util.Objects;
  * or framework-specific dependencies.
  * </p>
  *
- * @param <M>   the domain model or aggregate root type
- * @param <I>  the identifier type of the model
+ * @param <M> the domain model or aggregate root type
+ * @param <I> the identifier type of the model
  * @param <R> the result type returned in the page content
  */
 public abstract class AbstractListModule<M, I, R>
         implements CrudModules.List<R> {
 
     /**
-     * Repository port used to retrieve paginated domain models.
+     * Query repository port used to retrieve paginated domain models.
      */
-    private final RepositoryPort<M, I> repository;
+    private final QueryRepositoryPort<M, I> repository;
 
     /**
-     * Creates a new list module with the given repository port.
+     * Creates a new list module with the given query repository port.
      *
-     * @param repository the repository port used for retrieval
+     * @param repository the query repository port used for retrieval
      * @throws NullPointerException if the repository is {@code null}
      */
-    protected AbstractListModule(RepositoryPort<M, I> repository) {
-        this.repository = Objects.requireNonNull(repository);
+    protected AbstractListModule(QueryRepositoryPort<M, I> repository) {
+        this.repository = Objects.requireNonNull(repository, "repository");
     }
 
     /**
-     * Executes the list use case with pagination.
+     * Executes the list use case with pagination and sorting.
+     *
+     * <p>
+     * This operation is read-only and must not modify the system state.
+     * </p>
      *
      * @param pageRequest pagination and sorting information
      * @return a {@link Page} containing the result representations

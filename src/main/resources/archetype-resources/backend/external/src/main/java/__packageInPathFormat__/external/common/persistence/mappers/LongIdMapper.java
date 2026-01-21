@@ -1,4 +1,4 @@
-package ${package}.external.common.persistence.mappings;
+package ${package}.external.common.persistence.mappers;
 
 import ${package}.external.common.persistence.mappers.IdMapper;
 import org.springframework.stereotype.Component;
@@ -20,10 +20,10 @@ import org.springframework.stereotype.Component;
 public class LongIdMapper implements IdMapper<Long, Long> {
 
     /**
-     * Returns the given identifier without modification.
+     * Returns the given domain identifier without modification.
      *
      * @param id the domain identifier
-     * @return the same identifier as database identifier
+     * @return the same value as database identifier
      */
     @Override
     public Long toDbId(Long id) {

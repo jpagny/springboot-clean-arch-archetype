@@ -5,7 +5,8 @@ package ${package}.external.common.persistence.mappers;
  *
  * <p>
  * This interface defines the translation boundary between the domain
- * representation (model) and the persistence representation (entity).
+ * representation (model or aggregate root) and the persistence
+ * representation (entity).
  * </p>
  *
  * <p>
@@ -14,7 +15,7 @@ package ${package}.external.common.persistence.mappers;
  * such as JPA, Hibernate, or database schemas.
  * </p>
  *
- * @param <M> the domain model type
+ * @param <M> the domain model or aggregate root type
  * @param <E> the persistence entity type
  */
 public interface PersistenceMapper<M, E> {

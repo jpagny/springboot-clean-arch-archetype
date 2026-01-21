@@ -9,11 +9,12 @@ package ${package}.external.common.persistence.mappers;
  * </p>
  *
  * <p>
- * It belongs to the external (infrastructure) layer and allows the Domain
- * layer to remain independent from database identifier representations.
+ * It belongs to the external (infrastructure) layer and ensures that
+ * the Domain layer remains independent from database identifier
+ * representations (e.g. Long, UUID, sequences).
  * </p>
  *
- * @param <I>   the domain identifier type
+ * @param <I> the domain identifier type
  * @param <K> the database identifier type
  */
 public interface IdMapper<I, K> {
@@ -22,7 +23,7 @@ public interface IdMapper<I, K> {
      * Converts a domain identifier into a database identifier.
      *
      * @param id the domain identifier
-     * @return the database identifier
+     * @return the corresponding database identifier
      */
     K toDbId(I id);
 
@@ -30,13 +31,13 @@ public interface IdMapper<I, K> {
      * Converts a database identifier into a domain identifier.
      *
      * <p>
-     * This method is optional and may be overridden by implementations
-     * when reverse mapping is required.
+     * This operation is optional and should be implemented only when
+     * reverse mapping is required by the persistence adapter.
      * </p>
      *
      * @param dbId the database identifier
-     * @return the domain identifier
-     * @throws UnsupportedOperationException if not implemented
+     * @return the corresponding domain identifier
+     * @throws UnsupportedOperationException if reverse mapping is not supported
      */
     default I toDomainId(K dbId) {
         throw new UnsupportedOperationException("toDomainId not implemented");

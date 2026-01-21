@@ -1,7 +1,7 @@
 package ${package}.domain.commons.crud.modules.impl;
 
 import ${package}.domain.commons.crud.modules.CrudModules;
-import ${package}.domain.commons.crud.ports.output.RepositoryPort;
+import ${package}.domain.commons.crud.ports.output.CommandRepositoryPort;
 
 import java.util.Objects;
 
@@ -10,12 +10,17 @@ import java.util.Objects;
  *
  * <p>
  * This class implements the {@link CrudModules.Delete} contract and provides
- * a reusable template for deleting domain models using a repository port.
+ * a reusable template for deleting an existing domain model or aggregate
+ * identified by its identifier.
  * </p>
  *
  * <p>
- * It follows the Template Method pattern and exposes hook methods that allow
- * subclasses to execute logic before and after the deletion process.
+ * It follows the Template Method pattern and defines a standard deletion flow:
+ * <ul>
+ *   <li>Execute pre-deletion logic</li>
+ *   <li>Delete the model using a command repository port</li>
+ *   <li>Execute post-deletion logic</li>
+ * </ul>
  * </p>
  *
  * <p>
@@ -23,25 +28,25 @@ import java.util.Objects;
  * infrastructure or framework-specific components.
  * </p>
  *
- * @param <M>  the domain model or aggregate root type
- * @param <ID> the identifier type of the model
+ * @param <M> the domain model or aggregate root type
+ * @param <I> the identifier type of the model
  */
 public abstract class AbstractDeleteModule<M, I>
         implements CrudModules.Delete<I> {
 
     /**
-     * Repository port used to delete the domain model.
+     * Command repository port used to delete the domain model.
      */
-    private final RepositoryPort<M, I> repository;
+    private final CommandRepositoryPort<M, I> repository;
 
     /**
-     * Creates a new delete module with the given repository port.
+     * Creates a new delete module with the given command repository port.
      *
-     * @param repository the repository port used to perform deletion
+     * @param repository the command repository port used to perform deletion
      * @throws NullPointerException if the repository is {@code null}
      */
-    protected AbstractDeleteModule(RepositoryPort<M, I> repository) {
-        this.repository = Objects.requireNonNull(repository);
+    protected AbstractDeleteModule(CommandRepositoryPort<M, I> repository) {
+        this.repository = Objects.requireNonNull(repository, "repository");
     }
 
     /**
@@ -82,7 +87,8 @@ public abstract class AbstractDeleteModule<M, I>
      * Hook method executed after the deletion has occurred.
      *
      * <p>
-     * This can be used to publish domain events or perform cleanup logic.
+     * This can be used to publish domain events or perform cleanup logic
+     * within the domain boundary.
      * Default implementation does nothing.
      * </p>
      *

@@ -1,4 +1,4 @@
-package ${package}.external.common.persistence.adapters;
+package ${package}.external.common.persistence.mappers;
 
 import ${package}.domain.commons.pagination.Sort;
 

@@ -1,7 +1,7 @@
 package ${package}.domain.commons.crud.modules.impl;
 
 import ${package}.domain.commons.crud.modules.CrudModules;
-import ${package}.domain.commons.crud.ports.output.RepositoryPort;
+import ${package}.domain.commons.crud.ports.output.CommandRepositoryPort;
 
 import java.util.Objects;
 
@@ -10,17 +10,17 @@ import java.util.Objects;
  *
  * <p>
  * This class implements the {@link CrudModules.Create} contract and provides
- * a reusable template for creating domain models using a repository port.
+ * a reusable template for creating a new domain model or aggregate root.
  * </p>
  *
  * <p>
- * It follows the Template Method pattern:
+ * It follows the Template Method pattern and defines a standard creation flow:
  * <ul>
- *   <li>Transforms an input command into a domain model</li>
- *   <li>Validates the model before persistence</li>
- *   <li>Saves the model through a repository port</li>
- *   <li>Executes post-creation logic</li>
- *   <li>Maps the persisted model to a result object</li>
+ *   <li>Transform an input command into a new domain model</li>
+ *   <li>Validate the model for creation</li>
+ *   <li>Persist the model using a command repository port</li>
+ *   <li>Execute post-creation logic</li>
+ *   <li>Map the persisted model to a result representation</li>
  * </ul>
  * </p>
  *
@@ -29,8 +29,8 @@ import java.util.Objects;
  * infrastructure or framework-specific components.
  * </p>
  *
- * @param <M>   the domain model or aggregate root type
- * @param <I>  the identifier type of the model
+ * @param <M> the domain model or aggregate root type
+ * @param <I> the identifier type of the model
  * @param <C> the command type containing creation data
  * @param <R> the result type returned after creation
  */
@@ -38,18 +38,18 @@ public abstract class AbstractCreateModule<M, I, C, R>
         implements CrudModules.Create<C, R> {
 
     /**
-     * Repository port used to persist the domain model.
+     * Command repository port used to persist the domain model.
      */
-    private final RepositoryPort<M, I> repository;
+    private final CommandRepositoryPort<M, I> repository;
 
     /**
-     * Creates a new create module with the given repository port.
+     * Creates a new create module with the given command repository port.
      *
-     * @param repository the repository port used for persistence
+     * @param repository the command repository port used for persistence
      * @throws NullPointerException if the repository is {@code null}
      */
-    protected AbstractCreateModule(RepositoryPort<M, I> repository) {
-        this.repository = Objects.requireNonNull(repository);
+    protected AbstractCreateModule(CommandRepositoryPort<M, I> repository) {
+        this.repository = Objects.requireNonNull(repository, "repository");
     }
 
     /**
@@ -58,11 +58,11 @@ public abstract class AbstractCreateModule<M, I, C, R>
      * <p>
      * The execution flow is:
      * <ol>
-     *   <li>Convert the command to a domain model</li>
+     *   <li>Convert the command to a new domain model</li>
      *   <li>Validate the model for creation</li>
      *   <li>Persist the model</li>
-     *   <li>Trigger post-creation hook</li>
-     *   <li>Convert the persisted model to a result</li>
+     *   <li>Execute post-creation hook</li>
+     *   <li>Convert the persisted model to a result representation</li>
      * </ol>
      * </p>
      *
@@ -79,15 +79,15 @@ public abstract class AbstractCreateModule<M, I, C, R>
     }
 
     /**
-     * Converts the creation command into a domain model.
+     * Converts the creation command into a new domain model.
      *
      * @param command the creation command
-     * @return the domain model to be persisted
+     * @return the new domain model to be persisted
      */
     protected abstract M toModel(C command);
 
     /**
-     * Converts the persisted domain model into a result object.
+     * Converts the persisted domain model into a result representation.
      *
      * @param saved the persisted domain model
      * @return the result representation

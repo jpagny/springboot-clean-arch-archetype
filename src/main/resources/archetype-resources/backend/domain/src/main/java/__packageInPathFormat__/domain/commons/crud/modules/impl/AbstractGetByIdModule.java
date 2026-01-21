@@ -1,7 +1,7 @@
 package ${package}.domain.commons.crud.modules.impl;
 
 import ${package}.domain.commons.crud.modules.CrudModules;
-import ${package}.domain.commons.crud.ports.output.RepositoryPort;
+import ${package}.domain.commons.crud.ports.output.QueryRepositoryPort;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -11,14 +11,15 @@ import java.util.Optional;
  *
  * <p>
  * This class implements the {@link CrudModules.GetById} contract and provides
- * a reusable template for retrieving a domain model by its identifier.
+ * a reusable template for retrieving a domain model or aggregate by its
+ * identifier.
  * </p>
  *
  * <p>
- * The responsibility of this module is limited to:
+ * This module represents a read-only use case and follows a simple query flow:
  * <ul>
- *   <li>Fetching the domain model through a repository port</li>
- *   <li>Mapping the model to a result representation</li>
+ *   <li>Retrieve the domain model using a query repository port</li>
+ *   <li>Map the retrieved model to a result representation</li>
  * </ul>
  * </p>
  *
@@ -27,30 +28,34 @@ import java.util.Optional;
  * or framework-specific dependencies.
  * </p>
  *
- * @param <M>   the domain model or aggregate root type
- * @param <I>  the identifier type of the model
+ * @param <M> the domain model or aggregate root type
+ * @param <I> the identifier type of the model
  * @param <R> the result type returned when the model is found
  */
 public abstract class AbstractGetByIdModule<M, I, R>
         implements CrudModules.GetById<I, R> {
 
     /**
-     * Repository port used to retrieve the domain model.
+     * Query repository port used to retrieve the domain model.
      */
-    private final RepositoryPort<M, I> repository;
+    private final QueryRepositoryPort<M, I> repository;
 
     /**
-     * Creates a new get-by-id module with the given repository port.
+     * Creates a new get-by-id module with the given query repository port.
      *
-     * @param repository the repository port used to retrieve entities
+     * @param repository the query repository port used to retrieve models
      * @throws NullPointerException if the repository is {@code null}
      */
-    protected AbstractGetByIdModule(RepositoryPort<M, I> repository) {
-        this.repository = Objects.requireNonNull(repository);
+    protected AbstractGetByIdModule(QueryRepositoryPort<M, I> repository) {
+        this.repository = Objects.requireNonNull(repository, "repository");
     }
 
     /**
      * Executes the get-by-id use case.
+     *
+     * <p>
+     * This operation is read-only and must not modify the system state.
+     * </p>
      *
      * @param id the unique identifier of the model
      * @return an {@link Optional} containing the result representation if found,
@@ -62,7 +67,7 @@ public abstract class AbstractGetByIdModule<M, I, R>
     }
 
     /**
-     * Converts the domain model into a result representation.
+     * Converts the retrieved domain model into a result representation.
      *
      * @param model the retrieved domain model
      * @return the result representation
