@@ -9,17 +9,29 @@ import ${package}.transport.endpoints.example.create.output.CreateExampleRespons
 import ${package}.domain.core.example.operations.commands.CreateExampleCommand;
 import ${package}.domain.core.example.operations.results.CreateExampleResult;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
-@RequiredArgsConstructor
-public class ExampleCreateEndpointHandler implements EndpointHandler<CreateExampleRequest, CreateExampleResponse> {
+public class ExampleCreateEndpointHandler
+        implements EndpointHandler<CreateExampleRequest, CreateExampleResponse> {
 
     private final InputPresenter<CreateExampleRequest, CreateExampleCommand> inPresenter;
     private final OutputPresenter<CreateExampleResult, CreateExampleResponse> outPresenter;
     private final ExampleService app;
 
+    public ExampleCreateEndpointHandler(
+            InputPresenter<CreateExampleRequest, CreateExampleCommand> inPresenter,
+            OutputPresenter<CreateExampleResult, CreateExampleResponse> outPresenter,
+            ExampleService app
+    ) {
+        this.inPresenter = Objects.requireNonNull(inPresenter, "inPresenter");
+        this.outPresenter = Objects.requireNonNull(outPresenter, "outPresenter");
+        this.app = Objects.requireNonNull(app, "app");
+    }
+
+    @Override
     public CreateExampleResponse handle(CreateExampleRequest req) {
         var cmd = inPresenter.toCommand(req);
         var result = app.create(cmd);

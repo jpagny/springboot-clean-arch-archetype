@@ -1,6 +1,7 @@
 package ${package}.external.common.persistence.adapters;
 
 import ${package}.domain.commons.pagination.Sort;
+import ${package}.external.common.persistence.mappers.SpringSortMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

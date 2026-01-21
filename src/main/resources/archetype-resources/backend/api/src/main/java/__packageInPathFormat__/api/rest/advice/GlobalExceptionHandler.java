@@ -1,12 +1,12 @@
-package ${package}.api.rest.advice;
+package com.mycompany.api.rest.advice;
 
-import ${package}.domain.commons.exceptions.engine.BaseBusinessException;
-import ${package}.transport.common.errors.DefaultErrorResponse;
-import ${package}.transport.common.errors.http.ErrorCodeToHttpStatusResolver;
-import ${package}.transport.common.i18n.BusinessErrorMessageResolver;
+import com.mycompany.domain.commons.exceptions.engine.BaseBusinessException;
+import com.mycompany.transport.common.errors.DefaultErrorResponse;
+import com.mycompany.transport.common.errors.http.ErrorCodeToHttpStatusResolver;
+import com.mycompany.transport.common.i18n.BusinessErrorMessageResolver;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,85 +18,51 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-/**
- * Global REST exception handler.
- *
- * <p>
- * This class belongs to the API layer and is responsible for translating
- * application and domain exceptions into HTTP responses.
- * </p>
- *
- * <p>
- * It acts as the final boundary between the transport/application layers
- * and the outside world by:
- * <ul>
- *   <li>Resolving HTTP status codes</li>
- *   <li>Localizing business error messages</li>
- *   <li>Building standardized error response payloads</li>
- *   <li>Enriching responses with request and tracing metadata</li>
- * </ul>
- * </p>
- *
- * <p>
- * This handler must not contain business logic. It only orchestrates
- * exception-to-response mapping.
- * </p>
- */
 @RestControllerAdvice
-@Slf4j
-@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
-    /**
-     * MDC key used to retrieve the correlation / trace identifier.
-     */
-    private static final String TRACE_ID_KEY = "X-Flow-Id";
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    /**
-     * Generic error code used for validation errors.
-     */
+    private static final String TRACE_ID_KEY = "X-Flow-Id";
     private static final String VALIDATION_ERROR_CODE = "VALIDATION_ERROR";
 
     private static final String FIELD_PAYLOAD_SEPARATOR = "|";
     private static final String FIELD_PAYLOAD_SPLIT_REGEX = "\\|";
 
-    /**
-     * Priority order for validation constraints.
-     *
-     * <p>
-     * When multiple validation errors occur on the same field,
-     * only the highest-priority constraint message is retained.
-     * </p>
-     */
     private static final List<String> CONSTRAINT_PRIORITY =
             List.of("NotBlank", "NotNull", "Size", "Pattern");
 
     private final BusinessErrorMessageResolver businessErrorMessageResolver;
     private final ErrorCodeToHttpStatusResolver httpStatusResolver;
 
-    /**
-     * Handles validation errors raised by Spring MVC.
-     *
-     * @param ex the validation exception
-     * @param request the HTTP request
-     * @return a {@link ResponseEntity} containing a validation error response
-     */
+    public GlobalExceptionHandler(
+            BusinessErrorMessageResolver businessErrorMessageResolver,
+            ErrorCodeToHttpStatusResolver httpStatusResolver
+    ) {
+        this.businessErrorMessageResolver =
+                Objects.requireNonNull(businessErrorMessageResolver, "businessErrorMessageResolver");
+        this.httpStatusResolver =
+                Objects.requireNonNull(httpStatusResolver, "httpStatusResolver");
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<DefaultErrorResponse> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
             HttpServletRequest request
     ) {
-        var message = buildValidationMessage(ex);
-        var traceId = MDC.get(TRACE_ID_KEY);
-        var status = HttpStatus.BAD_REQUEST;
-        var path = request.getRequestURI();
+        String message = buildValidationMessage(ex);
+        String traceId = MDC.get(TRACE_ID_KEY);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String path = request.getRequestURI();
 
-        log.error("[VALIDATION_ERROR] path='{}' traceId='{}' -> {}",
+        LOGGER.error("[VALIDATION_ERROR] path='{}' traceId='{}' -> {}",
                 path, traceId, message);
 
-        var body = DefaultErrorResponse.of(
+        DefaultErrorResponse body = DefaultErrorResponse.of(
                 VALIDATION_ERROR_CODE,
                 null,
                 message,
@@ -107,38 +73,26 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(body);
     }
 
-    /**
-     * Handles domain business exceptions.
-     *
-     * <p>
-     * Business exceptions are translated into localized, client-facing
-     * error responses using transport-layer resolvers.
-     * </p>
-     *
-     * @param ex the business exception
-     * @param request the HTTP request
-     * @return a {@link ResponseEntity} containing the error response
-     */
     @ExceptionHandler(BaseBusinessException.class)
     public ResponseEntity<DefaultErrorResponse> handleBaseBusinessException(
             BaseBusinessException ex,
             HttpServletRequest request
     ) {
-        var locale = request.getLocale() != null
+        Locale locale = request.getLocale() != null
                 ? request.getLocale()
                 : Locale.getDefault();
 
-        var traceId = MDC.get(TRACE_ID_KEY);
-        var path = request.getRequestURI();
+        String traceId = MDC.get(TRACE_ID_KEY);
+        String path = request.getRequestURI();
 
-        var status = httpStatusResolver.resolve(ex.getCode());
-        var localized = businessErrorMessageResolver.resolve(
+        HttpStatus status = httpStatusResolver.resolve(ex.getCode());
+        String localized = businessErrorMessageResolver.resolve(
                 ex.getBusinessError(),
                 locale,
                 ex.getArgs()
         );
 
-        log.error(
+        LOGGER.error(
                 "[BUSINESS_ERROR] code='{}' business='{}' path='{}' traceId='{}' message='{}' args={}",
                 ex.getCode(),
                 ex.getBusinessCode(),
@@ -149,7 +103,7 @@ public class GlobalExceptionHandler {
                 ex
         );
 
-        var body = DefaultErrorResponse.of(
+        DefaultErrorResponse body = DefaultErrorResponse.of(
                 ex.getCode().name(),
                 ex.getBusinessCode(),
                 localized,
@@ -161,28 +115,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(body);
     }
 
-    /**
-     * Handles unexpected technical exceptions.
-     *
-     * <p>
-     * This is a safety net to prevent internal exceptions from leaking
-     * implementation details to clients.
-     * </p>
-     *
-     * @param ex the unexpected exception
-     * @param request the HTTP request
-     * @return a {@link ResponseEntity} containing a generic error response
-     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<DefaultErrorResponse> handleUnexpectedException(
             Exception ex,
             HttpServletRequest request
     ) {
-        var traceId = MDC.get(TRACE_ID_KEY);
-        var path = request.getRequestURI();
-        var status = HttpStatus.INTERNAL_SERVER_ERROR;
+        String traceId = MDC.get(TRACE_ID_KEY);
+        String path = request.getRequestURI();
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        log.error(
+        LOGGER.error(
                 "[UNEXPECTED_ERROR] path='{}' traceId='{}' -> {}",
                 path,
                 traceId,
@@ -190,7 +132,7 @@ public class GlobalExceptionHandler {
                 ex
         );
 
-        var body = DefaultErrorResponse.of(
+        DefaultErrorResponse body = DefaultErrorResponse.of(
                 ex.getClass().getSimpleName(),
                 null,
                 ex.getMessage(),
@@ -202,31 +144,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(body);
     }
 
-    /**
-     * Builds a consolidated validation error message.
-     *
-     * <p>
-     * For each field, only the most relevant validation constraint
-     * message is retained based on {@link #CONSTRAINT_PRIORITY}.
-     * </p>
-     *
-     * @param ex the validation exception
-     * @return a human-readable validation error message
-     */
     private static String buildValidationMessage(MethodArgumentNotValidException ex) {
         Map<String, String> perField = new LinkedHashMap<>();
 
         ex.getBindingResult().getFieldErrors().forEach(fe -> {
-            var field = fe.getField();
-            var code = fe.getCode();
-            var msg = fe.getDefaultMessage();
+            String field = fe.getField();
+            String code = fe.getCode();
+            String msg = fe.getDefaultMessage();
 
             if (!perField.containsKey(field)) {
                 perField.put(field, code + FIELD_PAYLOAD_SEPARATOR + msg);
                 return;
             }
 
-            var currentCode =
+            String currentCode =
                     perField.get(field).split(FIELD_PAYLOAD_SPLIT_REGEX, 2)[0];
 
             int newP = CONSTRAINT_PRIORITY.indexOf(code);
@@ -242,9 +173,9 @@ public class GlobalExceptionHandler {
 
         return perField.entrySet().stream()
                 .map(e -> {
-                    var parts = e.getValue()
-                            .split(FIELD_PAYLOAD_SPLIT_REGEX, 2);
-                    var message = (parts.length == 2 ? parts[1] : "");
+                    String[] parts =
+                            e.getValue().split(FIELD_PAYLOAD_SPLIT_REGEX, 2);
+                    String message = (parts.length == 2 ? parts[1] : "");
                     return e.getKey() + ": " + message;
                 })
                 .collect(Collectors.joining("; "));

@@ -98,7 +98,6 @@ API Response
 
 ```java
 @Component
-@RequiredArgsConstructor
 public class ExampleCreateHandler
         implements EndpointHandler<CreateExampleRequest, Mono<CreateExampleResponse>> {
 
@@ -106,12 +105,22 @@ public class ExampleCreateHandler
     private final OutputPresenter<CreateExampleResult, CreateExampleResponse> out;
     private final ExampleUseCase useCase;
 
+    public ExampleCreateHandler(
+            InputPresenter<CreateExampleRequest, CreateExampleCommand> in,
+            OutputPresenter<CreateExampleResult, CreateExampleResponse> out,
+            ExampleUseCase useCase) {
+        this.in = in;
+        t        his.out = out;
+        this.useCase = useCase;
+    }
+
     @Override
     public Mono<CreateExampleResponse> handle(CreateExampleRequest req) {
-        var cmd = in.toCommand(req);
+        CreateExampleCommand cmd = in.toCommand(req);
         return useCase.process(cmd).map(out::toResponse);
     }
 }
+
 ```
 
 ---
@@ -137,10 +146,13 @@ Use **`process(...)`** for application service methods.
 
 ```java
 @Service
-@RequiredArgsConstructor
 public class CreateExampleUseCaseImpl implements CreateExampleUseCase {
 
     private final ExampleRepositoryPort repo;
+
+    public CreateExampleUseCaseImpl(ExampleRepositoryPort repo) {
+        this.repo = repo;
+    }
 
     @Override
     @Transactional
@@ -211,17 +223,23 @@ Implements *domain* and *application* ports using technical adapters:
 
 ```java
 @Repository
-@RequiredArgsConstructor
 public class ExampleRepositoryAdapter implements ExampleRepositoryPort {
 
     private final ExampleR2dbcRepository repo;
     private final ExampleMapper mapper;
 
+    public ExampleRepositoryAdapter(
+            ExampleR2dbcRepository repo,
+            ExampleMapper mapper) {
+        this.repo = repo;
+        this.mapper = mapper;
+    }
+
     @Override
     public Example register(Example example) {
         return repo.save(mapper.toEntity(example))
-                   .map(mapper::toDomain)
-                   .block();
+                .map(mapper::toDomain)
+                .block();
     }
 }
 ```

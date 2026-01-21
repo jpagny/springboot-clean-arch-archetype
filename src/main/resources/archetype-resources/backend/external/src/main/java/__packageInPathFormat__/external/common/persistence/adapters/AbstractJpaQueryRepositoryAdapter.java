@@ -5,6 +5,7 @@ import ${package}.domain.commons.pagination.Page;
 import ${package}.domain.commons.pagination.PageRequest;
 import ${package}.external.common.persistence.mappers.IdMapper;
 import ${package}.external.common.persistence.mappers.PersistenceMapper;
+import ${package}.external.common.persistence.mappers.SpringSortMapper;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Objects;

@@ -3,7 +3,6 @@ package ${package}.transport.common.i18n.impl;
 import ${package}.domain.commons.exceptions.engine.ErrorContext;
 import ${package}.domain.commons.exceptions.engine.IBusinessError;
 import ${package}.transport.common.i18n.BusinessErrorMessageResolver;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Component;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.util.Locale;
 
 @Component
-@RequiredArgsConstructor
 public class BusinessErrorMessageResolverImpl implements BusinessErrorMessageResolver {
 
     private static final String ERROR_KEY_PREFIX = "error";
@@ -21,28 +19,36 @@ public class BusinessErrorMessageResolverImpl implements BusinessErrorMessageRes
 
     private final MessageSourceAccessor accessor;
 
+    public BusinessErrorMessageResolverImpl(MessageSourceAccessor accessor) {
+        this.accessor = accessor;
+    }
+
     @Override
     public String resolve(IBusinessError error, Locale locale, Object... args) {
         if (error == null || error.code() == null) {
             return FALLBACK_INTERNAL_ERROR_CODE;
         }
 
-        final var codeLower = error.code().name().toLowerCase(Locale.ROOT);
-        final var context   = resolveContext(error);
+        String codeLower = error.code().name().toLowerCase(Locale.ROOT);
+        String context   = resolveContext(error);
 
-        final var ctxKey = String.join(KEY_SEPARATOR, ERROR_KEY_PREFIX, context, codeLower);
-        final var ctxMsg = tryResolve(ctxKey, locale, args);
-        if (ctxMsg != null) return ctxMsg;
+        String ctxKey = String.join(KEY_SEPARATOR, ERROR_KEY_PREFIX, context, codeLower);
+        String ctxMsg = tryResolve(ctxKey, locale, args);
+        if (ctxMsg != null) {
+            return ctxMsg;
+        }
 
-        final var globalKey = String.join(KEY_SEPARATOR, ERROR_KEY_PREFIX, codeLower);
-        final var globalMsg = tryResolve(globalKey, locale, args);
-        if (globalMsg != null) return globalMsg;
+        String globalKey = String.join(KEY_SEPARATOR, ERROR_KEY_PREFIX, codeLower);
+        String globalMsg = tryResolve(globalKey, locale, args);
+        if (globalMsg != null) {
+            return globalMsg;
+        }
 
         return error.code().name();
     }
 
     private String resolveContext(IBusinessError error) {
-        var ann = error.getClass().getAnnotation(ErrorContext.class);
+        ErrorContext ann = error.getClass().getAnnotation(ErrorContext.class);
         return (ann != null && ann.value() != null && !ann.value().isBlank())
                 ? ann.value().toLowerCase(Locale.ROOT)
                 : DEFAULT_CONTEXT;

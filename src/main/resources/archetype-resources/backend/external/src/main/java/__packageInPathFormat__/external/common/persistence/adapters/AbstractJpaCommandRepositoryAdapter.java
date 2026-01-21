@@ -3,6 +3,7 @@ package ${package}.external.common.persistence.adapters;
 import ${package}.domain.commons.crud.ports.output.CommandRepositoryPort;
 import ${package}.external.common.persistence.mappers.IdMapper;
 import ${package}.external.common.persistence.mappers.PersistenceMapper;
+import ${package}.external.common.persistence.mappers.SpringSortMapper;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Objects;
